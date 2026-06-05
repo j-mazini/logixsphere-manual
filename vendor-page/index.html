@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Driver / Vendor Manual</title>
+<style>
+  /* ===========================================================
+     DESIGN TOKENS
+  =========================================================== */
+  :root{
+    --bg:#f5f7fa;
+    --bg-2:#e8ecf1;
+    --surface:rgba(255,255,255,.55);
+    --surface-2:rgba(255,255,255,.78);
+    --stroke:rgba(255,255,255,.7);
+    --stroke-strong:rgba(100,120,180,.28);
+    --ink:#1a2238;
+    --ink-dim:#4a5474;
+    --ink-faint:#8b93ac;
+    --accent:#2563eb;
+    --accent-2:#10b981;
+    --accent-3:#8b5bff;
+    --warn:#ef5d76;
+    --good:#13b985;
+    --radius:22px;
+    --radius-sm:14px;
+    --shadow:0 24px 60px -30px rgba(60,80,140,.4);
+    --glass-hi:rgba(255,255,255,.9);
+    --font:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:var(--font);
+    background:var(--bg);
+    color:var(--ink);
+    line-height:1.6;
+    overflow-x:hidden;
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh;
+  }
+
+  /* ===========================================================
+     ANIMATED AURORA BACKGROUND
+  =========================================================== */
+  .aurora{position:fixed;inset:0;z-index:-2;overflow:hidden;background:
+     radial-gradient(1200px 800px at 80% -10%, #dbeafe 0%, transparent 60%),
+     radial-gradient(1000px 700px at -10% 20%, #d1fae5 0%, transparent 55%),
+     linear-gradient(180deg,#f9fafb 0%,var(--bg) 100%);}
+  .blob{position:absolute;border-radius:50%;filter:blur(90px);opacity:.55;mix-blend-mode:normal;animation:float 22s ease-in-out infinite}
+  .blob.b1{width:520px;height:520px;background:#bfdbfe;top:-120px;left:-80px}
+  .blob.b2{width:460px;height:460px;background:#a7f3d0;bottom:-140px;right:-60px;animation-delay:-7s}
+  .blob.b3{width:380px;height:380px;background:#c4adff;top:40%;left:55%;animation-delay:-13s;opacity:.45}
+  @keyframes float{
+    0%,100%{transform:translate(0,0) scale(1)}
+    33%{transform:translate(60px,40px) scale(1.1)}
+    66%{transform:translate(-40px,30px) scale(.95)}
+  }
+  .grid-overlay{position:fixed;inset:0;z-index:-1;pointer-events:none;
+    background-image:linear-gradient(rgba(80,100,160,.05) 1px,transparent 1px),
+                     linear-gradient(90deg,rgba(80,100,160,.05) 1px,transparent 1px);
+    background-size:54px 54px;
+    mask-image:radial-gradient(ellipse 80% 60% at 50% 0%,#000 30%,transparent 75%);}
+
+  /* ===========================================================
+     LAYOUT
+  =========================================================== */
+  .wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+
+  /* ---------- HERO ---------- */
+  header.hero{padding:84px 0 38px;text-align:center;position:relative}
+  .eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--accent-2);font-weight:600;
+    padding:7px 16px;border:1px solid var(--stroke-strong);border-radius:100px;
+    background:var(--surface);backdrop-filter:blur(12px);
+    animation:rise .8s cubic-bezier(.2,.7,.2,1) both}
+  .eyebrow .dot{width:7px;height:7px;border-radius:50%;background:var(--accent-2);
+    box-shadow:0 0 12px var(--accent-2);animation:pulse 2.2s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+
+  h1.title{font-size:clamp(38px,7vw,76px);line-height:1.02;font-weight:800;
+    letter-spacing:-.03em;margin:22px 0 14px;
+    background:linear-gradient(180deg,#1a2238 20%,#46527a 100%);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    animation:rise .9s cubic-bezier(.2,.7,.2,1) .05s both}
+  h1.title .grad{background:linear-gradient(110deg,var(--accent) 0%,var(--accent-2) 55%,var(--accent-3) 100%);
+    -webkit-background-clip:text;background-clip:text;color:transparent}
+  .lede{max-width:660px;margin:0 auto;color:var(--ink-dim);font-size:clamp(15px,2.1vw,18.5px);
+    animation:rise 1s cubic-bezier(.2,.7,.2,1) .12s both}
+  .hero-stats{display:flex;flex-wrap:wrap;justify-content:center;gap:14px;margin-top:34px;
+    animation:rise 1.1s cubic-bezier(.2,.7,.2,1) .2s both}
+  .stat{padding:14px 22px;border:1px solid var(--stroke);border-radius:var(--radius-sm);
+    background:var(--surface);backdrop-filter:blur(12px);min-width:120px}
+  .stat b{display:block;font-size:26px;font-weight:800;letter-spacing:-.02em;
+    background:linear-gradient(120deg,var(--accent-2),var(--accent));
+    -webkit-background-clip:text;background-clip:text;color:transparent}
+  .stat span{font-size:12px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:.08em}
+
+  /* ---------- TABS ---------- */
+  .tabs-shell{position:relative;margin:28px 0 16px;display:flex;align-items:center;justify-content:center;gap:0;z-index:10}
+  .tabs{display:flex;gap:4px;overflow-x:auto;scroll-behavior:smooth;scrollbar-width:none}
+  .tabs::-webkit-scrollbar{display:none}
+  .tab{padding:11px 18px;font-size:14px;font-weight:600;color:var(--ink-faint);white-space:nowrap;border:1px solid transparent;
+    border-radius:var(--radius-sm);cursor:pointer;transition:all .25s;position:relative;display:flex;gap:8px;align-items:center}
+  .tab svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2}
+  .tab.active{color:var(--accent);background:rgba(37,99,235,.08);border-color:var(--stroke-strong)}
+  .tab:hover:not(.active){color:var(--ink-dim);background:rgba(0,0,0,.02)}
+  .tab-arrow{flex:0 0 auto;background:none;border:none;cursor:pointer;color:var(--ink-faint);padding:8px;
+    display:none;align-items:center;justify-content:center;transition:color .25s}
+  .tab-arrow:hover{color:var(--ink-dim)}
+  @media(max-width:900px){.tabs-shell{flex-wrap:wrap}.tab-arrow{display:flex}}
+
+  main{display:grid;grid-template-columns:1fr;gap:0}
+  .panel{display:none;grid-column:1;animation:fadeIn .3s ease-in}
+  .panel.active{display:block}
+  
+  @keyframes fadeIn{
+    from{opacity:0;transform:translateY(8px)}
+    to{opacity:1;transform:none}
+  }
+
+  .panel-head{display:flex;align-items:baseline;gap:14px;margin-bottom:20px;padding-bottom:18px;
+    border-bottom:1px solid var(--stroke)}
+  .panel-head .num{font-size:32px;font-weight:800;color:var(--accent-2);letter-spacing:-.02em}
+  .panel-head h2{font-size:28px;font-weight:700;letter-spacing:-.02em;flex:1}
+  .panel-intro{font-size:15.5px;color:var(--ink-dim);margin-bottom:26px;line-height:1.7}
+
+  /* ---------- GRID & CARDS ---------- */
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-bottom:26px}
+  .card{display:flex;flex-direction:column;gap:10px;padding:26px;border:1px solid var(--stroke);border-radius:var(--radius);
+    background:linear-gradient(150deg,rgba(255,255,255,.74),rgba(255,255,255,.44));
+    backdrop-filter:blur(26px) saturate(180%);-webkit-backdrop-filter:blur(26px) saturate(180%);
+    box-shadow:var(--shadow),inset 0 1px 0 var(--glass-hi),inset 0 0 0 1px rgba(255,255,255,.18);
+    transition:transform .3s,border-color .3s}
+  .card:hover{transform:translateY(-4px);border-color:var(--stroke-strong)}
+  .card .ic svg,.flip-face .ic svg{width:23px;height:23px;stroke:var(--accent);fill:none;stroke-width:1.8;
+    stroke-linecap:round;stroke-linejoin:round}
+  .card h3,.flip-face h3{font-size:18px;font-weight:700;margin-bottom:8px;letter-spacing:-.01em}
+  .card p,.flip-face p{color:var(--ink-dim);font-size:14.5px}
+  .card .tag{display:inline-block;margin-top:14px;font-size:11.5px;font-weight:600;
+    color:var(--accent-2);text-transform:uppercase;letter-spacing:.09em;
+    padding:4px 11px;border:1px solid var(--stroke);border-radius:100px}
+
+  /* ---------- FEATURE LIST ---------- */
+  .feat-list{list-style:none;display:grid;gap:10px;margin-top:8px}
+  .feat-list li{display:flex;gap:11px;align-items:flex-start;color:var(--ink-dim);font-size:14.5px}
+  .feat-list li svg{width:18px;height:18px;flex-shrink:0;margin-top:3px;stroke:var(--good);
+    fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+  /* ---------- CALLOUT ---------- */
+  .callout{grid-column:1/-1;display:flex;gap:16px;align-items:flex-start;padding:22px 24px;
+    border-radius:var(--radius);border:1px solid rgba(37,99,235,.3);backdrop-filter:blur(14px);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.6);
+    background:linear-gradient(120deg,rgba(37,99,235,.14),rgba(255,255,255,.4))}
+  .callout svg{width:24px;height:24px;flex-shrink:0;stroke:var(--accent);fill:none;stroke-width:1.9;
+    stroke-linecap:round;stroke-linejoin:round;margin-top:2px}
+  .callout h4{font-size:15.5px;margin-bottom:4px}
+  .callout p{color:var(--ink-dim);font-size:14px}
+
+  /* ---------- WIDE / SPECIAL BLOCKS ---------- */
+  .wide{grid-column:1/-1}
+
+  /* ---------- THREE-PARTS GUIDE STRIP ---------- */
+  .parts{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:0 0 28px}
+  .part{position:relative;padding:20px 22px;border-radius:var(--radius-sm);overflow:hidden;
+    border:1px solid var(--stroke);background:linear-gradient(150deg,rgba(255,255,255,.66),rgba(255,255,255,.4));
+    backdrop-filter:blur(18px) saturate(160%);-webkit-backdrop-filter:blur(18px) saturate(160%);
+    box-shadow:inset 0 1px 0 var(--glass-hi);transition:transform .3s,border-color .3s,background .3s}
+  .part::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;
+    background:linear-gradient(180deg,var(--accent),var(--accent-2))}
+  .part:hover{transform:translateY(-4px);border-color:var(--stroke-strong)}
+  .part .pn{font-size:11.5px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--accent-2)}
+  .part h4{font-size:16px;margin:7px 0 6px;font-weight:700;letter-spacing:-.01em}
+  .part p{font-size:13px;color:var(--ink-dim)}
+
+  /* ---------- FOOTER ---------- */
+  footer{border-top:1px solid var(--stroke);padding:34px 0;text-align:center;color:var(--ink-faint);font-size:13px}
+  footer b{color:var(--ink-dim)}
+
+  @keyframes rise{
+    from{opacity:0;transform:translateY(20px)}
+    to{opacity:1;transform:none}
+  }
+
+  /* ===========================================================
+     RESPONSIVE — TABLET & MOBILE
+  =========================================================== */
+
+  @media(max-width:900px){
+    .wrap{padding:0 20px}
+    header.hero{padding:64px 0 30px}
+    .grid{grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+  }
+
+  @media(max-width:680px){
+    .wrap{padding:0 16px}
+    header.hero{padding:48px 0 26px}
+    .hero-stats{flex-direction:column;gap:10px;margin-top:26px}
+    .stat{flex:1 1 auto;width:100%;min-width:0;padding:14px 18px;
+      display:flex;align-items:baseline;justify-content:center;gap:10px}
+    .stat b{display:inline;font-size:24px}
+    .grid{grid-template-columns:1fr;gap:14px}
+    .card{padding:20px}
+    .panel-intro{font-size:15px;margin-bottom:20px}
+    .parts{grid-template-columns:1fr}
+  }
+
+  @media(max-width:400px){
+    .wrap{padding:0 12px}
+    header.hero{padding:40px 0 22px}
+    .card{padding:16px}
+    .tab{padding:9px 14px;font-size:13px}
+  }
+
+  ::selection{background:rgba(16,185,129,.3)}
+</style>
+</head>
+<body>
+
+<div class="aurora">
+  <div class="blob b1"></div>
+  <div class="blob b2"></div>
+  <div class="blob b3"></div>
+</div>
+<div class="grid-overlay"></div>
+
+<div class="wrap">
+
+  <!-- ============ HERO ============ -->
+  <header class="hero">
+    <div class="eyebrow"><span class="dot"></span> Driver profile</div>
+    <h1 class="title">BA Express<br><span class="grad">Vendor guide</span></h1>
+    <p class="lede">A simple guide to what drivers and vendors can do in BA Express / Logix Sphere, which screens they can access, and how their personal data stays protected.</p>
+    <div class="hero-stats">
+      <div class="stat"><b>7</b><span>Allowed screens</span></div>
+      <div class="stat"><b>3</b><span>Request types</span></div>
+      <div class="stat"><b>1</b><span>Personal account</span></div>
+      <div class="stat"><b>100%</b><span>Driver-only data</span></div>
+    </div>
+  </header>
+
+  <!-- ============ TAB BAR ============ -->
+  <div class="tabs-shell">
+    <div class="tabs" role="tablist">
+      <button class="tab active" data-tab="overview">
+        <svg viewBox="0 0 24 24"><path d="M3 12h7V3H3zM14 21h7v-9h-7zM14 3v6h7V3zM3 21h7v-6H3z"/></svg>Overview</button>
+      <button class="tab" data-tab="getting-started">
+        <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg>Screens</button>
+      <button class="tab" data-tab="integration">
+        <svg viewBox="0 0 24 24"><path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>Activities</button>
+      <button class="tab" data-tab="operations">
+        <svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 14l3-4 3 3 5-7"/></svg>Requests</button>
+      <button class="tab" data-tab="analytics">
+        <svg viewBox="0 0 24 24"><path d="M12 20V10M18 20V4M6 20v-4"/></svg>Limits</button>
+      <button class="tab" data-tab="support">
+        <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>Security</button>
+    </div>
+  </div>
+
+  <main>
+
+    <!-- =================================================================
+         OVERVIEW
+    ================================================================== -->
+    <section class="panel active" id="overview">
+      <div class="panel-head"><span class="num">01</span><h2>Overview: what the driver profile is for</h2></div>
+      <p class="panel-intro">The Driver / Vendor profile is made for subcontractors who need to follow their own work, performance, earnings, deductions, payslips, and requests. It is a personal account, not an administrative account.</p>
+
+      <div class="parts">
+        <div class="part"><div class="pn">Main use</div><h4>Mobile self-service</h4>
+          <p>Drivers mainly use the system from a phone to check their own information.</p></div>
+        <div class="part"><div class="pn">Access rule</div><h4>Own data only</h4>
+          <p>Every screen is filtered so the driver sees only records linked to their login.</p></div>
+        <div class="part"><div class="pn">Not admin</div><h4>No management access</h4>
+          <p>Drivers do not manage users, operations, invoices, deductions, or approvals.</p></div>
+      </div>
+
+      <div class="grid">
+        <div class="card">
+          <div class="ic"><svg viewBox="0 0 24 24"><path d="M12 2 2 7l10 5 10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
+          <h3>Performance</h3>
+          <p>Drivers can review daily and monthly performance, including route results, stops, operational indicators, punctuality notes, and verified operation status.</p>
+          <span class="tag">Personal metrics</span>
+        </div>
+
+        <div class="card">
+          <div class="ic"><svg viewBox="0 0 24 24"><path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg></div>
+          <h3>Operations and earnings</h3>
+          <p>Drivers can check worked days, completed routes, paid and unpaid stops, hours, calculated values, extras, route sort, and adhoc sort when available.</p>
+          <span class="tag">Own operations</span>
+        </div>
+
+        <div class="card">
+          <div class="ic"><svg viewBox="0 0 24 24"><path d="M12 20V10M18 20V4M6 20v-4"/></svg></div>
+          <h3>Deductions and payslips</h3>
+          <p>Drivers can view deductions assigned to them, open payslip details, check values, and download the payment document as a PDF.</p>
+          <span class="tag">Payment records</span>
+        </div>
+
+        <div class="card">
+          <div class="ic"><svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></div>
+          <h3>Requests</h3>
+          <p>Drivers can submit requests, such as day off, holiday, and pre-payment, then follow the history and status. They cannot approve their own requests.</p>
+          <span class="tag">Submit and track</span>
+        </div>
+
+        <div class="callout">
+          <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/></svg>
+          <div>
+            <h4>Simple rule</h4>
+            <p>The driver profile is for checking personal work and payment information. It does not give access to company administration or other drivers' data.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =================================================================
+         GETTING STARTED
+    ================================================================== -->
+    <section class="panel" id="getting-started">
+      <div class="panel-head"><span class="num">02</span><h2>Screens available to drivers</h2></div>
+      <p class="panel-intro">The driver has access to a limited set of screens. If a driver tries to open a screen that is not allowed, the system redirects them back to Daily Performance Insight.</p>
+
+      <div class="grid">
+        <div class="card">
+          <div class="ic"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+          <h3>Daily Performance Insight</h3>
+          <p>The main driver screen. It shows daily route performance, stops, status, punctuality, notes, and indicators such as SPR and SPOR-H.</p>
+        </div>
+
+        <div class="card">
+          <div class="ic"><svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></div>
+          <h3>Current Performance</h3>
+          <p>Shows monthly performance, averages, daily comparisons, stops, and operational indicators so the driver can follow progress over the month.</p>
+        </div>
+
+        <div class="card">
+          <div class="ic"><svg viewBox="0 0 24 24"><path d="M3 12h18M3 6h18M3 18h18"/></svg></div>
+          <h3>Current Month</h3>
+          <p>Shows the current or selected month's operations and earnings, including worked days, routes, hours, paid stops, unpaid stops, and calculated values.</p>
+        </div>
+
+        <div class="card">
+          <div class="ic"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"/></svg></div>
+          <h3>Subcontractor</h3>
+          <p>Gives a more detailed operational view of the driver's own records, such as route, vehicle when available, stops, worked hours, values, notes, and status.</p>
+        </div>
+
+        <div class="card">
+          <div class="ic"><svg viewBox="0 0 24 24"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>
+          <h3>Deductions</h3>
+          <p>Shows deductions linked to the driver, such as repairs, fines, advances, liquidation damages, or other administrative discounts.</p>
+        </div>
+
+        <div class="card">
+          <div class="ic"><svg viewBox="0 0 24 24"><path d="M9 12l2 2 4-4M7 20H5a2 2 0 01-2-2V5a2 2 0 012-2h14a2 2 0 012 2v12a2 2 0 01-2 2h-2.76a2 2 0 00-1.79 1.89v.111a2 2 0 01-2 2h-3.5a2 2 0 01-2-2v-.5"/></svg></div>
+          <h3>Mobile Invoice</h3>
+          <p>Also known as My Payslips. The driver can view payslips or invoices, open the details, check values, and download the PDF.</p>
+        </div>
+
+        <div class="card">
+          <div class="ic"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+          <h3>Requests</h3>
+          <p>Lets the driver submit requests and follow their status history. Approval is handled by the appropriate administrative team.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- =================================================================
+         INTEGRATION
+    ================================================================== -->
+    <section class="panel" id="integration">
+      <div class="panel-head"><span class="num">03</span><h2>What the driver can do</h2></div>
+      <p class="panel-intro">The driver can consult personal work records and payment-related documents. The profile is designed for visibility and follow-up, not for editing the operation.</p>
+
+      <div class="grid">
+        <div class="card wide">
+          <div class="ic"><svg viewBox="0 0 24 24"><path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg></div>
+          <h3>Review daily performance</h3>
+          <p>Drivers can check the route completed, operation status, number of stops, performance indicators, punctuality information, operation notes, and whether the operation was verified.</p>
+          <span class="tag">Daily insight</span>
+        </div>
+
+        <div class="card">
+          <div class="ic"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+          <h3>Follow monthly progress</h3>
+          <p>Drivers can view performance averages, day-by-day results, stops, operational indicators, and comparisons between worked days.</p>
+          <span class="tag">Current performance</span>
+        </div>
+
+        <div class="card">
+          <div class="ic"><svg viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"/></svg></div>
+          <h3>Check operations and earnings</h3>
+          <p>Drivers can review worked days, routes, operation details, paid and unpaid stops, schedules, calculated values, extras, route sort, and adhoc sort when present.</p>
+          <span class="tag">Current month</span>
+        </div>
+
+        <div class="card">
+          <div class="ic"><svg viewBox="0 0 24 24"><path d="M12 8v4m0 4v.01M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"/></svg></div>
+          <h3>View deductions and payslips</h3>
+          <p>Drivers can consult deductions assigned to them and access payment documents. They can view details, confirm values, and download payslips as PDF files.</p>
+          <span class="tag">Payment details</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- =================================================================
+         OPERATIONS
+    ================================================================== -->
+    <section class="panel" id="operations">
+      <div class="panel-head"><span class="num">04</span><h2>Requests drivers can submit</h2></div>
+      <p class="panel-intro">Drivers can open requests for review and follow their history. Submitting a request does not mean it is approved; approval is handled outside the driver profile.</p>
+
+      <div class="grid">
+        <div class="card">
+          <div class="ic"><svg viewBox="0 0 24 24"><path d="M9 19v-6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2zm0 0V9a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v10m-6 0a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2m0 0V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-2a2 2 0 0 1-2-2z"/></svg></div>
+          <h3>Day Off</h3>
+          <p>A request for a specific day off. The driver submits the date and can follow the status after it is sent.</p>
+        </div>
+
+        <div class="card">
+          <div class="ic"><svg viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m7 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"/></svg></div>
+          <h3>Holiday</h3>
+          <p>A request for a period of absence or vacation. The request remains in the driver's history so it can be tracked later.</p>
+        </div>
+
+        <div class="card">
+          <div class="ic"><svg viewBox="0 0 24 24"><path d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"/></svg></div>
+          <h3>Pre-Payment</h3>
+          <p>A request for an advance payment. The driver can submit it and follow the status, but cannot approve or process the payment.</p>
+        </div>
+
+        <div class="card">
+          <div class="ic"><svg viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"/></svg></div>
+          <h3>Status history</h3>
+          <p>After a request is submitted, it stays in the request history. The driver can check the status, but cannot approve, reject, or delete requests.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- =================================================================
+         ANALYTICS
+    ================================================================== -->
+    <section class="panel" id="analytics">
+      <div class="panel-head"><span class="num">05</span><h2>What the driver cannot do</h2></div>
+      <p class="panel-intro">The driver profile does not include administrative, operational editing, approval, or company finance permissions. It is intentionally limited to the driver's own records.</p>
+
+      <div class="grid">
+        <div class="card wide">
+          <div class="ic"><svg viewBox="0 0 24 24"><path d="M12 20V10M18 20V4M6 20v-4"/></svg></div>
+          <h3>No administrative screens</h3>
+          <p>Drivers cannot access the administrative Home, Week Planner, Daily Game Plan, Daily Operations Management, master records, contracts, assets, or consolidated reports.</p>
+          <span class="tag">No admin access</span>
+        </div>
+
+        <div class="card">
+          <div class="ic"><svg viewBox="0 0 24 24"><path d="M9 19v-6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2zm0 0V9a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v10m-6 0a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2m0 0V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-2a2 2 0 0 1-2-2z"/></svg></div>
+          <h3>No operation editing</h3>
+          <p>Drivers cannot create, change, finish, or approve operations. They also cannot register vendors, register vehicles, or change operational records.</p>
+          <span class="tag">Read-only operation</span>
+        </div>
+
+        <div class="card">
+          <div class="ic"><svg viewBox="0 0 24 24"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>
+          <h3>No company finance access</h3>
+          <p>Drivers cannot access administrative finance, create invoices, create deductions, edit deductions, or manage company-level payment records.</p>
+          <span class="tag">Personal finance only</span>
+        </div>
+
+        <div class="card">
+          <div class="ic"><svg viewBox="0 0 24 24"><path d="M9 12l2 2 4-4M7 20H5a2 2 0 01-2-2V5a2 2 0 012-2h14a2 2 0 012 2v12a2 2 0 01-2 2h-2.76a2 2 0 00-1.79 1.89v.111a2 2 0 01-2 2h-3.5a2 2 0 01-2-2v-.5"/></svg></div>
+          <h3>No access to other drivers</h3>
+          <p>Drivers cannot view another driver's performance, deductions, payslips, requests, or personal information.</p>
+          <span class="tag">Own data only</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- =================================================================
+         SUPPORT
+    ================================================================== -->
+    <section class="panel" id="support">
+      <div class="panel-head"><span class="num">06</span><h2>How driver data is protected</h2></div>
+      <p class="panel-intro">The system identifies the driver through the login token. That token tells the system who the user is, which user type they have, which company they belong to, and which service partner is linked when applicable.</p>
+
+      <div class="grid">
+        <div class="card">
+          <div class="ic"><svg viewBox="0 0 24 24"><path d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>
+          <h3>Allowed screens only</h3>
+          <p>The driver sees only screens allowed for the Driver profile. If a restricted screen is opened, the system redirects the driver to Daily Performance Insight.</p>
+        </div>
+
+        <div class="card">
+          <div class="ic"><svg viewBox="0 0 24 24"><path d="M18.364 5.636l-3.536 3.536m0 5.172l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.172l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"/></svg></div>
+          <h3>Filtered payslips and invoices</h3>
+          <p>Payslips and invoices are filtered by the logged-in user. The system prevents one driver from opening another driver's payment document.</p>
+        </div>
+
+        <div class="card">
+          <div class="ic"><svg viewBox="0 0 24 24"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg></div>
+          <h3>Filtered deductions</h3>
+          <p>Deductions are filtered by the logged-in driver, so the driver only sees deductions linked to their own account.</p>
+        </div>
+
+        <div class="card">
+          <div class="ic"><svg viewBox="0 0 24 24"><path d="M18.364 5.636l-3.536 3.536m0 5.172l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.172l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"/></svg></div>
+          <h3>Service partner link</h3>
+          <p>When a service partner is linked to the token, service partner data follows that link. This keeps driver information connected to the correct account and company.</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+</div>
+
+<footer>
+  <p>© 2024 BA Express / Logix Sphere - Driver / Vendor access manual. All rights reserved. <b>v1.0</b></p>
+</footer>
+
+<script>
+  // Tab switching
+  document.addEventListener('DOMContentLoaded', function() {
+    const tabs = document.querySelectorAll('.tab');
+    const panels = document.querySelectorAll('.panel');
+
+    function switchTab(tabName) {
+      // Remove the active class from tabs and panels
+      tabs.forEach(t => t.classList.remove('active'));
+      panels.forEach(p => p.classList.remove('active'));
+      
+      // Activate the clicked tab and matching panel
+      const activeTab = document.querySelector(`[data-tab="${tabName}"]`);
+      const activePanel = document.getElementById(tabName);
+      
+      if (activeTab) activeTab.classList.add('active');
+      if (activePanel) activePanel.classList.add('active');
+    }
+
+    // Add click events to all tabs
+    tabs.forEach(tab => {
+      tab.addEventListener('click', (e) => {
+        e.preventDefault();
+        const tabName = tab.getAttribute('data-tab');
+        switchTab(tabName);
+      });
+    });
+  });
+</script>
+
+</body>
+</html>
