@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LogiXSphere UX 2.0 - Operations Master Planner</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+        }
+        /* Configuração exata A4 Paisagem (Landscape) */
+        .page-landscape {
+            width: 297mm;
+            min-height: 210mm;
+            padding: 20mm;
+            margin: 0 auto;
+            position: relative;
+            background-color: #f8fafc;
+        }
+        /* Evita quebras de tabela feias ao gerar o PDF */
+        .avoid-break {
+            page-break-inside: avoid;
+            break-inside: avoid;
+        }
+        @media print {
+            @page {
+                size: A4 landscape;
+                margin: 0;
+            }
+            body { 
+                background-color: #f8fafc; 
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            .page-landscape {
+                width: 100%;
+                height: 100%;
+                padding: 15mm;
+                margin: 0;
+            }
+        }
+    </style>
+</head>
+<body class="text-slate-900 antialiased">
+
+    <main class="page-landscape flex flex-col justify-between gap-8">
+        
+        <div class="flex flex-col gap-8">
+            
+            <header class="w-full bg-white border border-slate-200/60 rounded-2xl p-6 shadow-sm flex justify-between items-center relative">
+                <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-blue-600 rounded-l-2xl"></div>
+                <div class="pl-3">
+                    <span class="text-xs font-bold text-blue-600 uppercase tracking-widest block mb-1">Master Logistics Schedule</span>
+                    <h1 class="text-2xl font-bold tracking-tight text-slate-900">Week Planner</h1>
+                </div>
+                <div class="flex items-center gap-3 bg-slate-50 border border-slate-200/60 px-4 py-2 rounded-xl">
+                    <i class="fa-regular fa-calendar text-slate-400 text-sm"></i>
+                    <span class="text-sm font-semibold text-slate-600 tracking-tight">Week 01/06-05/06</span>
+                </div>
+            </header>
+
+            <div class="flex flex-col gap-4 avoid-break">
+                <div class="inline-flex items-center gap-3 bg-slate-900 text-white rounded-xl px-4 py-2.5 shadow-sm self-start">
+                    <i class="fa-solid fa-building text-blue-400 text-sm"></i>
+                    <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Depot:</span>
+                    <h3 class="text-sm font-bold tracking-tight text-white">LSE (London South East)</h3>
+                </div>
+
+                <section class="w-full bg-white border border-slate-200/70 rounded-2xl shadow-sm overflow-hidden">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-50 text-slate-500 text-xs font-semibold uppercase tracking-wider border-b border-slate-200/60">
+                                <th class="py-3 px-6 w-1/5"><span class="flex items-center gap-2"><i class="fa-solid fa-user text-[10px]"></i> Vendor</span></th>
+                                <th class="py-3 px-4 w-1/12"><span class="flex items-center gap-2"><i class="fa-solid fa-calendar-day text-[10px]"></i> Date</span></th>
+                                <th class="py-3 px-4 w-1/12"><span class="flex items-center gap-2"><i class="fa-solid fa-route text-[10px]"></i> Route</span></th>
+                                <th class="py-3 px-6 w-1/6"><span class="flex items-center gap-2"><i class="fa-solid fa-truck text-[10px]"></i> Vehicle</span></th>
+                                <th class="py-3 px-4 w-1/12 text-center"><span class="flex items-center gap-2 justify-center"><i class="fa-solid fa-boxes-stacked text-[10px]"></i> Sort</span></th>
+                                <th class="py-3 px-6 w-1/3"><span class="flex items-center gap-2"><i class="fa-solid fa-paragraph text-[10px]"></i> Notes</span></th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-sm divide-y divide-slate-100 text-slate-600 font-medium">
+                            <tr class="bg-white hover:bg-slate-50/40 transition-colors">
+                                <td class="py-3 px-6 text-slate-900 font-semibold">Jonathan Santos</td>
+                                <td class="py-3 px-4 font-mono text-xs text-slate-500">05/06</td>
+                                <td class="py-3 px-4"><span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-blue-50 text-blue-700 border border-blue-100/50 font-mono">DY1B</span></td>
+                                <td class="py-3 px-6 text-slate-700 font-medium"><i class="fa-solid fa-van-shuttle mr-1.5 text-slate-400 text-xs"></i> Mercedes Sprinter (LV23)</td>
+                                <td class="py-3 px-4 text-center">
+                                    <span class="inline-flex items-center justify-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-100">Y</span>
+                                </td>
+                                <td class="py-3 px-6 text-slate-400 text-xs font-normal">Prioridade matinal. Carga frágil eletrónica.</td>
+                            </tr>
+                            <tr class="bg-white hover:bg-slate-50/40 transition-colors">
+                                <td class="py-3 px-6 text-slate-900 font-semibold">Ana Beatriz Ramos</td>
+                                <td class="py-3 px-4 font-mono text-xs text-slate-500">01/06</td>
+                                <td class="py-3 px-4"><span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-blue-50 text-blue-700 border border-blue-100/50 font-mono">LSE4</span></td>
+                                <td class="py-3 px-6 text-slate-700 font-medium"><i class="fa-solid fa-truck-moving mr-1.5 text-slate-400 text-xs"></i> Ford Transit (FX68)</td>
+                                <td class="py-3 px-4 text-center">
+                                    <span class="inline-flex items-center justify-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-100">Y</span>
+                                </td>
+                                <td class="py-3 px-6 text-slate-400 text-xs font-normal">Aguardando confirmação de recebimento do hub secundário.</td>
+                            </tr>
+                            <tr class="bg-white hover:bg-slate-50/40 transition-colors">
+                                <td class="py-3 px-6 text-slate-900 font-semibold">Carlos Henrique</td>
+                                <td class="py-3 px-4 font-mono text-xs text-slate-500">03/06</td>
+                                <td class="py-3 px-4"><span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-amber-50 text-amber-700 border border-amber-100/50 font-mono">DY3A</span></td>
+                                <td class="py-3 px-6 text-slate-700 font-medium"><i class="fa-solid fa-van-shuttle mr-1.5 text-slate-400 text-xs"></i> Iveco Daily (MK21)</td>
+                                <td class="py-3 px-4 text-center">
+                                    <span class="inline-flex items-center justify-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-rose-50 text-rose-700 border border-rose-100">N</span>
+                                </td>
+                                <td class="py-3 px-6 text-amber-600 text-xs font-normal"><i class="fa-solid fa-triangle-exclamation mr-1"></i> Alerta: Rota com desvio por obras na pista.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </section>
+            </div>
+
+            <div class="flex flex-col gap-4 avoid-break">
+                <div class="inline-flex items-center gap-3 bg-slate-900 text-white rounded-xl px-4 py-2.5 shadow-sm self-start">
+                    <i class="fa-solid fa-building text-purple-400 text-sm"></i>
+                    <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Depot:</span>
+                    <h3 class="text-sm font-bold tracking-tight text-white">LNW (London North West)</h3>
+                </div>
+
+                <section class="w-full bg-white border border-slate-200/70 rounded-2xl shadow-sm overflow-hidden">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-50 text-slate-500 text-xs font-semibold uppercase tracking-wider border-b border-slate-200/60">
+                                <th class="py-3 px-6 w-1/5">Vendor</th>
+                                <th class="py-3 px-4 w-1/12">Date</th>
+                                <th class="py-3 px-4 w-1/12">Route</th>
+                                <th class="py-3 px-6 w-1/6">Vehicle</th>
+                                <th class="py-3 px-4 w-1/12 text-center">Sort</th>
+                                <th class="py-3 px-6 w-1/3">Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-sm divide-y divide-slate-100 text-slate-600 font-medium">
+                            <tr class="bg-white hover:bg-slate-50/40 transition-colors">
+                                <td class="py-3 px-6 text-slate-900 font-semibold">Marcus Vance</td>
+                                <td class="py-3 px-4 font-mono text-xs text-slate-500">02/06</td>
+                                <td class="py-3 px-4"><span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-purple-50 text-purple-700 border border-purple-100/50 font-mono">NW10</span></td>
+                                <td class="py-3 px-6 text-slate-700 font-medium"><i class="fa-solid fa-van-shuttle mr-1.5 text-slate-400 text-xs"></i> Renault Master (RE70)</td>
+                                <td class="py-3 px-4 text-center">
+                                    <span class="inline-flex items-center justify-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-100">Y</span>
+                                </td>
+                                <td class="py-3 px-6 text-slate-400 text-xs font-normal">Janela de entrega estendida até às 20:00.</td>
+                            </tr>
+                            <tr class="bg-white hover:bg-slate-50/40 transition-colors">
+                                <td class="py-3 px-6 text-slate-900 font-semibold">Elena Rostova</td>
+                                <td class="py-3 px-4 font-mono text-xs text-slate-500">04/06</td>
+                                <td class="py-3 px-4"><span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-purple-50 text-purple-700 border border-purple-100/50 font-mono">NW12</span></td>
+                                <td class="py-3 px-6 text-slate-700 font-medium"><i class="fa-solid fa-truck-moving mr-1.5 text-slate-400 text-xs"></i> Scania P250 (SC22)</td>
+                                <td class="py-3 px-4 text-center">
+                                    <span class="inline-flex items-center justify-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-rose-50 text-rose-700 border border-rose-100">N</span>
+                                </td>
+                                <td class="py-3 px-6 text-slate-400 text-xs font-normal">—</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </section>
+            </div>
+
+        </div>
+
+        <footer class="flex justify-between items-center text-[11px] text-slate-400 font-medium border-t border-slate-200/60 pt-4 mt-8 avoid-break">
+            <div class="flex items-center gap-2">
+                <span class="w-1.5 h-1.5 bg-blue-500 rounded-full inline-block animate-pulse"></span>
+                <p class="tracking-tight">LogiXSphere UX 2.0 • Operational Analytics Master Engine</p>
+            </div>
+            <p class="font-mono bg-slate-100 px-2 py-0.5 rounded text-slate-500 text-[10px]">DOCUMENTO INTEGRAL</p>
+        </footer>
+
+    </main>
+
+</body>
+</html>

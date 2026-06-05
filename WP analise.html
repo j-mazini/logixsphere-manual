@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#eef2fb" />
+  <title>Week Planner | Dashboard Operacional</title>
+  <style>
+    :root {
+      --bg: #eaeefb;
+      --bg-2: #e0e7f8;
+      --ink: #131a2e;
+      --text: #131a2e;
+      --muted: #5b6783;
+      --line: rgba(20,30,60,.10);
+      --island: rgba(255,255,255,.78);
+      --island-solid: #ffffff;
+      --panel: #ffffff;
+      --hi: rgba(255,255,255,.9);
+      --soft: rgba(20,40,90,.05);
+      --blue: #2f6bff;
+      --green: #10b56a;
+      --yellow: #e0a200;
+      --red: #ef4444;
+      --purple: #7c3aed;
+      --cyan: #0891b2;
+      --shadow: 0 14px 34px rgba(40,60,120,.16);
+      --shadow-lg: 0 22px 50px rgba(40,60,120,.22);
+      --safe-b: env(safe-area-inset-bottom, 0px);
+    }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: -apple-system, Inter, "Segoe UI", Roboto, Arial, sans-serif;
+      color: var(--ink);
+      line-height: 1.55;
+      background:
+        radial-gradient(120% 80% at 10% -10%, rgba(79,140,255,.26), transparent 45%),
+        radial-gradient(120% 80% at 110% 0%, rgba(155,92,255,.20), transparent 42%),
+        linear-gradient(180deg, var(--bg), var(--bg-2));
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+      min-height: 100vh;
+    }
+    img, svg, canvas { max-width: 100%; }
+    p { margin: 0; color: var(--muted); }
+
+    /* ================= DESKTOP / TABLET ================= */
+    .desktop { display: block; }
+    .mobile { display: none; }
+
+    .container { width: min(1180px, calc(100% - 32px)); margin: 0 auto; }
+    header { padding: 48px 0 24px; }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.25fr .75fr;
+      gap: 24px; align-items: stretch;
+    }
+    .card {
+      background: var(--island);
+      border: 1px solid var(--hi);
+      border-radius: 26px;
+      box-shadow: var(--shadow);
+      padding: 26px;
+      backdrop-filter: blur(18px) saturate(160%);
+      -webkit-backdrop-filter: blur(18px) saturate(160%);
+      position: relative; overflow: hidden;
+      transition: transform .35s cubic-bezier(.2,.8,.2,1), box-shadow .35s ease;
+    }
+    .card::before {
+      content: ""; position: absolute; left: 0; right: 0; top: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--hi), transparent);
+    }
+    .card:hover { transform: translateY(-6px); box-shadow: var(--shadow-lg); }
+
+    .glare {
+      position: absolute; top: -60%; left: -30%; width: 60%; height: 220%;
+      background: linear-gradient(105deg, transparent, rgba(255,255,255,.5), transparent);
+      transform: rotate(8deg) translateX(-120%);
+      transition: transform .9s ease; z-index: 3; pointer-events: none; mix-blend-mode: overlay;
+    }
+    .card:hover .glare { transform: rotate(8deg) translateX(360%); }
+
+    .eyebrow {
+      display: inline-flex; gap: 8px; align-items: center;
+      padding: 8px 12px; border: 1px solid rgba(47,107,255,.3);
+      background: rgba(47,107,255,.12); color: var(--blue);
+      border-radius: 999px; font-size: 13px; font-weight: 700; letter-spacing: .3px;
+    }
+    h1 {
+      font-size: clamp(34px, 6vw, 60px); line-height: 1; margin: 18px 0 14px;
+      background: linear-gradient(120deg, var(--ink), var(--blue), var(--purple));
+      -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+      background-size: 200% auto; animation: shine 6s linear infinite;
+    }
+    @keyframes shine { to { background-position: 200% center; } }
+    h2 { font-size: 26px; margin: 0 0 18px; }
+    h3 { font-size: 18px; margin: 0 0 10px; }
+    .hero p { font-size: 18px; max-width: 760px; }
+
+    .stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; height: 100%; }
+    .stat {
+      background: var(--island-solid); border: 1px solid var(--line); border-radius: 20px;
+      padding: 18px; min-height: 120px; box-shadow: var(--shadow);
+      transition: transform .3s ease, box-shadow .3s ease;
+    }
+    .stat:hover { transform: translateY(-5px) scale(1.02); }
+    .stat .num {
+      font-size: 36px; font-weight: 900; margin-bottom: 4px;
+      background: linear-gradient(120deg, var(--blue), var(--cyan));
+      -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .stat span { color: var(--muted); font-size: 13px; }
+
+    main { padding: 16px 0 56px; }
+    section { margin-top: 22px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+    .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; }
+
+    .feature { min-height: 200px; }
+    .feature .blob {
+      position: absolute; width: 130px; height: 130px; border-radius: 999px;
+      right: -42px; top: -42px; background: var(--accent, var(--blue));
+      opacity: .2; filter: blur(8px); z-index: 0; animation: float 6s ease-in-out infinite;
+    }
+    @keyframes float { 0%,100% { transform: translateY(0) scale(1); } 50% { transform: translateY(14px) scale(1.12); } }
+    .feature h3, .feature p, .feature .icon { position: relative; z-index: 1; }
+    .icon {
+      width: 44px; height: 44px; border-radius: 14px; display: grid; place-items: center;
+      background: var(--island-solid); border: 1px solid var(--line); margin-bottom: 14px;
+      font-size: 22px; box-shadow: var(--shadow); transition: transform .35s ease;
+    }
+    .card:hover .icon { transform: scale(1.12) rotate(-6deg); }
+
+    .timeline { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+    .step-d {
+      background: var(--soft); border: 1px solid var(--line); border-radius: 18px;
+      padding: 18px; transition: transform .3s ease;
+    }
+    .step-d:hover { transform: translateY(-4px); }
+    .step-d b { color: var(--yellow); }
+    .badge-d {
+      display: inline-grid; place-items: center; width: 34px; height: 34px; border-radius: 50%;
+      background: rgba(47,107,255,.14); color: var(--blue);
+      border: 1px solid rgba(47,107,255,.35); margin-bottom: 10px; font-weight: 900;
+    }
+
+    .access-list { display: grid; gap: 12px; }
+    .access-item {
+      display: grid; grid-template-columns: 42px 1fr; gap: 12px; padding: 14px;
+      border-radius: 16px; background: var(--soft); border: 1px solid var(--line);
+      transition: transform .3s ease;
+    }
+    .access-item:hover { transform: translateX(6px); }
+    .access-item strong { display: block; margin-bottom: 2px; }
+
+    .bar-chart { display: grid; gap: 14px; margin-top: 8px; }
+    .bar-row { display: grid; grid-template-columns: 150px 1fr 42px; align-items: center; gap: 12px; color: var(--muted); font-size: 14px; }
+    .bar-track { height: 14px; background: var(--soft); border-radius: 999px; overflow: hidden; border: 1px solid var(--line); }
+    .bar-fill {
+      height: 100%; width: 0; border-radius: 999px;
+      background: linear-gradient(90deg, var(--blue), var(--cyan));
+      position: relative; transition: width 1.3s cubic-bezier(.2,.8,.2,1);
+    }
+    .bar-fill::after {
+      content: ""; position: absolute; inset: 0;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,.5), transparent);
+      transform: translateX(-100%); animation: barShine 2.4s ease-in-out infinite;
+    }
+    @keyframes barShine { 60%,100% { transform: translateX(100%); } }
+    .in-view .bar-fill { width: var(--w); }
+
+    .donut-wrap { display: grid; grid-template-columns: 230px 1fr; align-items: center; gap: 18px; }
+    .donut {
+      width: 210px; height: 210px; border-radius: 50%; margin: auto; position: relative;
+      background: conic-gradient(var(--blue) 0 0,var(--green) 0 0,var(--yellow) 0 0,var(--purple) 0 0,var(--red) 0 0);
+      box-shadow: inset 0 0 40px rgba(40,60,120,.12);
+      transition: background 1.5s cubic-bezier(.2,.8,.2,1), transform .5s ease;
+    }
+    .donut:hover { transform: rotate(8deg) scale(1.03); }
+    .in-view .donut { background: conic-gradient(var(--blue) 0 30%, var(--green) 30% 55%, var(--yellow) 55% 75%, var(--purple) 75% 90%, var(--red) 90% 100%); }
+    .donut::after {
+      content: "Fluxo"; position: absolute; inset: 34px; border-radius: 50%;
+      background: var(--panel); display: grid; place-items: center;
+      font-weight: 900; font-size: 22px; color: var(--ink); border: 1px solid var(--line);
+    }
+    .legend { display: grid; gap: 10px; }
+    .legend-item { display: flex; gap: 10px; align-items: center; color: var(--muted); }
+    .dot { width: 12px; height: 12px; border-radius: 50%; background: var(--c); }
+
+    .week-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; }
+    .day {
+      min-height: 150px; background: var(--soft); border: 1px solid var(--line);
+      border-radius: 18px; padding: 12px; transition: transform .3s ease, box-shadow .3s ease;
+    }
+    .day:hover { transform: translateY(-5px); box-shadow: var(--shadow); }
+    .day h4 { margin: 0 0 10px; font-size: 14px; }
+    .pill {
+      display: block; padding: 7px 9px; border-radius: 10px; margin-bottom: 8px;
+      background: rgba(47,107,255,.10); border: 1px solid rgba(47,107,255,.2); font-size: 12px;
+    }
+    .pill.yellow { background: rgba(224,162,0,.12); border-color: rgba(224,162,0,.22); }
+    .pill.green { background: rgba(16,181,106,.10); border-color: rgba(16,181,106,.2); }
+    .pill.red { background: rgba(239,68,68,.10); border-color: rgba(239,68,68,.2); }
+
+    .rules { display: grid; gap: 12px; }
+    .desktop details { background: var(--soft); border: 1px solid var(--line); border-radius: 18px; padding: 16px 18px; }
+    .desktop summary { cursor: pointer; font-weight: 800; }
+    .desktop details p { margin-top: 10px; }
+    .alert { border-left: 5px solid var(--red); }
+
+    footer { color: var(--muted); text-align: center; padding: 24px 0 40px; }
+
+    .reveal { opacity: 0; transform: translateY(30px) scale(.98); transition: opacity .7s cubic-bezier(.2,.8,.2,1), transform .7s cubic-bezier(.2,.8,.2,1); }
+    .reveal.in-view { opacity: 1; transform: none; }
+    .grid-3 > .reveal:nth-child(1){transition-delay:.04s}.grid-3 > .reveal:nth-child(2){transition-delay:.1s}.grid-3 > .reveal:nth-child(3){transition-delay:.16s}.grid-3 > .reveal:nth-child(4){transition-delay:.22s}.grid-3 > .reveal:nth-child(5){transition-delay:.28s}.grid-3 > .reveal:nth-child(6){transition-delay:.34s}
+    .timeline > .reveal:nth-child(1){transition-delay:.05s}.timeline > .reveal:nth-child(2){transition-delay:.12s}.timeline > .reveal:nth-child(3){transition-delay:.19s}.timeline > .reveal:nth-child(4){transition-delay:.26s}
+
+    @media (max-width: 1024px) {
+      .grid-3 { grid-template-columns: repeat(2, 1fr); }
+      .timeline { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    /* ================= MOBILE APP (ilhas) ================= */
+    @media (max-width: 760px) {
+      .desktop { display: none; }
+      .mobile { display: block; }
+    }
+
+    .app {
+      width: min(440px, 100%); margin: 0 auto; min-height: 100vh; position: relative;
+      padding: 0 16px calc(var(--safe-b) + 40px);
+    }
+    .topbar {
+      position: sticky; top: 0; z-index: 30;
+      padding: calc(env(safe-area-inset-top, 0px) + 14px) 2px 12px;
+      background: linear-gradient(180deg, var(--bg) 60%, transparent);
+      display: flex; align-items: center; gap: 12px;
+    }
+    .avatar {
+      width: 42px; height: 42px; flex: none; border-radius: 14px; display: grid; place-items: center;
+      font-size: 20px; background: linear-gradient(140deg, var(--blue), var(--purple)); color: #fff; box-shadow: var(--shadow);
+    }
+    .topbar h1 { font-size: 17px; margin: 0; line-height: 1.15; -webkit-text-fill-color: initial; background: none; animation: none; color: var(--ink); }
+    .topbar p { font-size: 12px; }
+
+    .island {
+      background: var(--island); border: 1px solid var(--hi); border-radius: 24px;
+      box-shadow: var(--shadow); backdrop-filter: blur(16px) saturate(160%); -webkit-backdrop-filter: blur(16px) saturate(160%);
+      padding: 18px; margin-bottom: 14px; position: relative; overflow: hidden;
+      animation: pop .5s cubic-bezier(.22,.61,.36,1) both;
+    }
+    .island::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 1px; background: linear-gradient(90deg, transparent, var(--hi), transparent); }
+    @keyframes pop { from { opacity: 0; transform: translateY(18px) scale(.98); } to { opacity: 1; transform: none; } }
+    .island:nth-child(2){animation-delay:.04s}.island:nth-child(3){animation-delay:.08s}.island:nth-child(4){animation-delay:.12s}.island:nth-child(5){animation-delay:.16s}
+
+    .island h2 { font-size: 13px; letter-spacing: .4px; text-transform: uppercase; color: var(--muted); margin: 0 0 14px; display: flex; align-items: center; gap: 8px; }
+    .island h2 .tag { margin-left: auto; text-transform: none; letter-spacing: 0; font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 999px; background: var(--soft); color: var(--muted); }
+
+    .m-hero { background: linear-gradient(150deg, #2f6bff, #7c3aed); color: #fff; border-color: transparent; }
+    .m-hero::before { background: linear-gradient(90deg, transparent, rgba(255,255,255,.5), transparent); }
+    .m-hero .eyebrow-m { display: inline-block; font-size: 11px; font-weight: 800; letter-spacing: .5px; padding: 5px 11px; border-radius: 999px; background: rgba(255,255,255,.18); margin-bottom: 12px; }
+    .m-hero h3 { margin: 0 0 8px; font-size: 23px; line-height: 1.15; }
+    .m-hero p { margin: 0; font-size: 13.5px; color: rgba(255,255,255,.88); }
+
+    .kpis { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .kpi { background: var(--island-solid); border: 1px solid var(--line); border-radius: 20px; padding: 14px; box-shadow: var(--shadow); transition: transform .25s cubic-bezier(.22,.61,.36,1); }
+    .kpi:active { transform: scale(.96); }
+    .kpi .num { font-size: 30px; font-weight: 900; line-height: 1; background: linear-gradient(120deg, var(--blue), var(--cyan)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+    .kpi span { font-size: 11.5px; color: var(--muted); display: block; margin-top: 6px; }
+
+    .feat { display: grid; gap: 10px; }
+    .feat-row { display: grid; grid-template-columns: 44px 1fr; gap: 12px; align-items: center; padding: 12px; border-radius: 16px; background: var(--soft); transition: transform .25s ease; }
+    .feat-row:active { transform: scale(.98); }
+    .feat-ic { width: 44px; height: 44px; border-radius: 13px; display: grid; place-items: center; font-size: 21px; background: var(--island-solid); border: 1px solid var(--line); box-shadow: var(--shadow); }
+    .feat-row strong { font-size: 14px; display: block; }
+    .feat-row p { margin: 2px 0 0; font-size: 12px; }
+
+    .steps { display: grid; padding-left: 8px; }
+    .step { display: grid; grid-template-columns: 30px 1fr; gap: 12px; padding-bottom: 16px; position: relative; }
+    .step:last-child { padding-bottom: 0; }
+    .step::before { content: ""; position: absolute; left: 14px; top: 30px; bottom: -2px; width: 2px; background: linear-gradient(var(--blue), transparent); }
+    .step:last-child::before { display: none; }
+    .step .badge { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; font-weight: 900; font-size: 13px; color: #fff; background: linear-gradient(140deg, var(--blue), var(--purple)); box-shadow: var(--shadow); z-index: 1; }
+    .step strong { font-size: 14px; }
+    .step p { margin: 2px 0 0; font-size: 12px; }
+
+    .bars { display: grid; gap: 13px; }
+    .m-bar-row { display: grid; gap: 6px; }
+    .bar-top { display: flex; justify-content: space-between; font-size: 12.5px; }
+    .bar-top b { color: var(--ink); }
+    .m-bar-track { height: 10px; border-radius: 999px; background: var(--soft); overflow: hidden; }
+    .m-bar-fill { height: 100%; width: 0; border-radius: 999px; background: linear-gradient(90deg, var(--blue), var(--cyan)); transition: width 1.1s cubic-bezier(.22,.61,.36,1); }
+    .visible .m-bar-fill { width: var(--w); }
+
+    .donut-box { display: flex; align-items: center; gap: 16px; }
+    .m-donut { width: 116px; height: 116px; flex: none; border-radius: 50%; position: relative; background: conic-gradient(var(--blue) 0 0,var(--green) 0 0,var(--yellow) 0 0,var(--purple) 0 0,var(--red) 0 0); transition: background 1.2s cubic-bezier(.22,.61,.36,1); }
+    .visible .m-donut { background: conic-gradient(var(--blue) 0 30%, var(--green) 30% 55%, var(--yellow) 55% 75%, var(--purple) 75% 90%, var(--red) 90% 100%); }
+    .m-donut::after { content: "Fluxo"; position: absolute; inset: 22px; border-radius: 50%; background: var(--island-solid); display: grid; place-items: center; font-weight: 900; font-size: 14px; box-shadow: inset 0 0 0 1px var(--line); }
+    .m-legend { display: grid; gap: 7px; font-size: 12px; color: var(--muted); flex: 1; }
+    .m-legend div { display: flex; align-items: center; gap: 8px; }
+    .m-legend .dot { width: 9px; height: 9px; flex: none; }
+
+    .week { display: grid; grid-auto-flow: column; grid-auto-columns: 78%; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; margin: 0 -18px; padding: 2px 18px 6px; scrollbar-width: none; }
+    .week::-webkit-scrollbar { display: none; }
+    .m-day { scroll-snap-align: center; background: var(--soft); border: 1px solid var(--line); border-radius: 18px; padding: 14px; }
+    .m-day h4 { margin: 0 0 10px; font-size: 14px; }
+    .swipe-hint { font-size: 11px; color: var(--muted); margin-top: 8px; text-align: center; }
+
+    .acc { display: grid; gap: 10px; }
+    .acc-item { display: grid; grid-template-columns: 38px 1fr; gap: 11px; }
+    .acc-ic { width: 38px; height: 38px; border-radius: 12px; display: grid; place-items: center; font-size: 18px; background: var(--soft); }
+    .acc-item strong { font-size: 13.5px; display: block; }
+    .acc-item p { margin: 2px 0 0; font-size: 12px; }
+    .island.alert { display: grid; gap: 12px; }
+    .island.alert p { margin: 0; font-size: 13px; }
+    .island.alert b { color: var(--ink); }
+
+    .mobile details { background: var(--soft); border-radius: 14px; padding: 13px 15px; margin-bottom: 9px; }
+    .mobile details:last-child { margin-bottom: 0; }
+    .mobile summary { cursor: pointer; font-weight: 700; font-size: 13.5px; list-style: none; display: flex; align-items: center; }
+    .mobile summary::-webkit-details-marker { display: none; }
+    .mobile summary::after { content: "＋"; margin-left: auto; color: var(--muted); font-weight: 400; }
+    .mobile details[open] summary::after { content: "－"; }
+    .mobile details p { margin: 9px 0 0; font-size: 12.5px; animation: fade .3s ease; }
+    @keyframes fade { from { opacity: 0 } to { opacity: 1 } }
+
+    .view { display: block; }
+    .view + .view { margin-top: 4px; }
+    .section-label { font-size: 12px; font-weight: 800; letter-spacing: .6px; text-transform: uppercase; color: var(--muted); margin: 22px 4px 12px; display: flex; align-items: center; gap: 8px; }
+    .section-label .ico { width: 16px; height: 16px; color: var(--blue); }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; transition: none !important; }
+      .reveal { opacity: 1; transform: none; }
+      .bar-fill, .m-bar-fill { width: var(--w) !important; }
+    }
+
+    /* ===== ícones SVG sóbrios ===== */
+    .ico { width: 22px; height: 22px; display: block; fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
+    .eyebrow .ico, .eyebrow-m .ico { width: 15px; height: 15px; stroke-width: 2; }
+    .eyebrow-m .ico { display: inline-block; vertical-align: -2px; margin-right: 4px; }
+    .island h2 .ico { width: 16px; height: 16px; color: var(--red); }
+    .avatar .ico { width: 22px; height: 22px; }
+    .feature .icon .ico, .access-item .icon .ico { color: var(--accent, var(--ink)); }
+  </style>
+</head>
+<body>
+
+  <!-- ===================== SPRITE DE ÍCONES ===================== -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+    <defs>
+      <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></symbol>
+      <symbol id="i-cursor" viewBox="0 0 24 24"><path d="M3 3l7.07 17 2.51-7.42L20 10.07z"/></symbol>
+      <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></symbol>
+      <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></symbol>
+      <symbol id="i-umbrella" viewBox="0 0 24 24"><path d="M23 12a11.05 11.05 0 0 0-22 0z"/><path d="M12 12v7a3 3 0 0 0 6 0"/></symbol>
+      <symbol id="i-pin" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></symbol>
+      <symbol id="i-lock" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></symbol>
+      <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+      <symbol id="i-building" viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="1"/><path d="M9 22v-4h6v4M8 6h.01M16 6h.01M8 10h.01M16 10h.01M8 14h.01M16 14h.01"/></symbol>
+      <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></symbol>
+      <symbol id="i-alert" viewBox="0 0 24 24"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4M12 17h.01"/></symbol>
+      <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></symbol>
+      <symbol id="i-layers" viewBox="0 0 24 24"><path d="M12 2 2 7l10 5 10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></symbol>
+      <symbol id="i-chart" viewBox="0 0 24 24"><path d="M12 20V10M18 20V4M6 20v-4"/></symbol>
+    </defs>
+  </svg>
+
+  <!-- ===================== DESKTOP ===================== -->
+  <div class="desktop">
+    <header class="container">
+      <div class="hero">
+        <div class="card reveal">
+          <span class="glare"></span>
+          <span class="eyebrow"><svg class="ico"><use href="#i-calendar"/></svg> Módulo 7 · Week Planner</span>
+          <h1>Planejamento semanal logístico-financeiro</h1>
+          <p>Dashboard explicativo sobre o Week Planner: uma grade de 7 dias que define a intenção da escala da semana seguinte e permite organizar motoristas, veículos, depósitos, rotas, folgas e serviços extras com antecedência.</p>
+        </div>
+        <div class="stats">
+          <div class="stat reveal"><div class="num">7</div><span>dias em grade operacional</span></div>
+          <div class="stat reveal"><div class="num">3</div><span>dias-chave para planejar: quarta a sexta</span></div>
+          <div class="stat reveal"><div class="num">2</div><span>modos de salvamento: Save e Assign All Week</span></div>
+          <div class="stat reveal"><div class="num">100%</div><span>proteção para histórico financeiro passado</span></div>
+        </div>
+      </div>
+    </header>
+
+    <main class="container">
+      <section class="grid-3">
+        <article class="card feature reveal" style="--accent: var(--blue)"><span class="glare"></span><span class="blob"></span><div class="icon"><svg class="ico"><use href="#i-cursor"/></svg></div><h3>Interface dinâmica</h3><p>Gestores montam e ajustam rotas visualmente usando Drag & Drop, acelerando a criação da escala semanal.</p></article>
+        <article class="card feature reveal" style="--accent: var(--green)"><span class="glare"></span><span class="blob"></span><div class="icon"><svg class="ico"><use href="#i-gear"/></svg></div><h3>Generate Week</h3><p>Com um clique, o sistema consulta registros padrão no banco master e preenche motoristas fixos em suas rotas e veículos habituais.</p></article>
+        <article class="card feature reveal" style="--accent: var(--purple)"><span class="glare"></span><span class="blob"></span><div class="icon"><svg class="ico"><use href="#i-copy"/></svg></div><h3>Copy to Next Week</h3><p>Duplica a estrutura da escala atual para a semana seguinte, reduzindo retrabalho e agilizando o gerenciamento.</p></article>
+        <article class="card feature reveal" style="--accent: var(--yellow)"><span class="glare"></span><span class="blob"></span><div class="icon"><svg class="ico"><use href="#i-umbrella"/></svg></div><h3>Day-Off Spare</h3><p>Se um motorista ativo ficar sem alocação, a plataforma cria automaticamente um registro de folga para manter a conformidade contábil.</p></article>
+        <article class="card feature reveal" style="--accent: var(--cyan)"><span class="glare"></span><span class="blob"></span><div class="icon"><svg class="ico"><use href="#i-pin"/></svg></div><h3>Atribuição flexível</h3><p>O usuário pode salvar a alteração apenas em um dia específico ou replicar motorista, veículo e triagem para a semana inteira.</p></article>
+        <article class="card feature reveal" style="--accent: var(--red)"><span class="glare"></span><span class="blob"></span><div class="icon"><svg class="ico"><use href="#i-lock"/></svg></div><h3>Trava temporal</h3><p>Datas atuais e passadas ficam em modo somente leitura, protegendo o histórico financeiro contra mudanças acidentais.</p></article>
+      </section>
+
+      <section class="card reveal">
+        <span class="glare"></span>
+        <h2>Cronograma de planejamento semanal</h2>
+        <div class="timeline">
+          <div class="step-d reveal"><span class="badge-d">1</span><h3>Lançar folgas</h3><p><b>Antes do Generate Week.</b> Folgas precisam ser registradas para evitar alocação indevida.</p></div>
+          <div class="step-d reveal"><span class="badge-d">2</span><h3>Gerar semana</h3><p>O Admin User executa o Generate Week para criar a base das alocações fixas.</p></div>
+          <div class="step-d reveal"><span class="badge-d">3</span><h3>Ajustar manualmente</h3><p>Inclui motoristas reservas, serviços extras e ajustes finos de frota.</p></div>
+          <div class="step-d reveal"><span class="badge-d">4</span><h3>Submeter até sexta</h3><p>Alterações após o prazo viram exceção e exigem justificativa real de urgência.</p></div>
+        </div>
+      </section>
+
+      <section class="grid-2">
+        <article class="card reveal">
+          <span class="glare"></span>
+          <h2>Gráfico: peso dos principais recursos</h2>
+          <div class="bar-chart">
+            <div class="bar-row"><span>Automação</span><div class="bar-track"><div class="bar-fill" style="--w: 92%"></div></div><strong>92%</strong></div>
+            <div class="bar-row"><span>Segurança</span><div class="bar-track"><div class="bar-fill" style="--w: 88%"></div></div><strong>88%</strong></div>
+            <div class="bar-row"><span>Produtividade</span><div class="bar-track"><div class="bar-fill" style="--w: 84%"></div></div><strong>84%</strong></div>
+            <div class="bar-row"><span>Flexibilidade</span><div class="bar-track"><div class="bar-fill" style="--w: 76%"></div></div><strong>76%</strong></div>
+            <div class="bar-row"><span>Exceções</span><div class="bar-track"><div class="bar-fill" style="--w: 62%"></div></div><strong>62%</strong></div>
+          </div>
+        </article>
+        <article class="card reveal">
+          <span class="glare"></span>
+          <h2>Gráfico: composição do fluxo</h2>
+          <div class="donut-wrap">
+            <div class="donut" aria-label="Gráfico de rosca do fluxo do Week Planner"></div>
+            <div class="legend">
+              <div class="legend-item"><span class="dot" style="--c: var(--blue)"></span>30% Alocações fixas automáticas</div>
+              <div class="legend-item"><span class="dot" style="--c: var(--green)"></span>25% Ajustes manuais</div>
+              <div class="legend-item"><span class="dot" style="--c: var(--yellow)"></span>20% Folgas e reservas</div>
+              <div class="legend-item"><span class="dot" style="--c: var(--purple)"></span>15% Serviços Ad-Hoc</div>
+              <div class="legend-item"><span class="dot" style="--c: var(--red)"></span>10% Exceções e urgências</div>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section class="card reveal">
+        <span class="glare"></span>
+        <h2>Visualização da grade semanal</h2>
+        <div class="week-grid">
+          <div class="day"><h4>Segunda</h4><span class="pill">Rotas fixas</span><span class="pill green">Motoristas ativos</span></div>
+          <div class="day"><h4>Terça</h4><span class="pill">Rotas fixas</span><span class="pill yellow">Ajustes pontuais</span></div>
+          <div class="day"><h4>Quarta</h4><span class="pill green">Início do ciclo</span><span class="pill yellow">Ad-Hoc provável</span></div>
+          <div class="day"><h4>Quinta</h4><span class="pill yellow">Prazo de folgas</span><span class="pill green">Serviços extras</span></div>
+          <div class="day"><h4>Sexta</h4><span class="pill green">Submissão final</span><span class="pill red">Exceções após prazo</span></div>
+          <div class="day"><h4>Sábado</h4><span class="pill">Execução planejada</span><span class="pill yellow">Monitoramento</span></div>
+          <div class="day"><h4>Domingo</h4><span class="pill">Execução planejada</span><span class="pill green">Fechamento da semana</span></div>
+        </div>
+      </section>
+
+      <section class="grid-2">
+        <article class="card reveal">
+          <span class="glare"></span>
+          <h2>Níveis de acesso</h2>
+          <div class="access-list">
+            <div class="access-item"><div class="icon"><svg class="ico"><use href="#i-clock"/></svg></div><div><strong>Trava de segurança temporal</strong><p>Edição apenas em datas futuras. Datas atuais e passadas ficam read-only.</p></div></div>
+            <div class="access-item"><div class="icon"><svg class="ico"><use href="#i-building"/></svg></div><div><strong>Controle por depósito</strong><p>Planejador ou supervisor acessa somente a base designada para aquele dia.</p></div></div>
+            <div class="access-item"><div class="icon"><svg class="ico"><use href="#i-shield"/></svg></div><div><strong>Acesso global</strong><p>Admin User acessa todos os depósitos pelo centralizador BAOP.</p></div></div>
+          </div>
+        </article>
+        <article class="card alert reveal">
+          <span class="glare"></span>
+          <h2>Pontos críticos</h2>
+          <p><strong>Folgas devem ser lançadas antes do Generate Week.</strong> Caso contrário, o sistema poderá alocar o motorista na rota padrão indevidamente.</p><br>
+          <p><strong>Serviços de última hora não passam pelo Week Planner.</strong> Eles são lançados diretamente no Daily Game Plan em tempo real.</p><br>
+          <p><strong>Acesso ao DGP é validado por depósito e data.</strong> Usuários não autorizados são bloqueados, exceto Admin User.</p>
+        </article>
+      </section>
+
+      <section class="card reveal">
+        <span class="glare"></span>
+        <h2>Regras de negócio e exceções</h2>
+        <div class="rules">
+          <details open><summary>A. Cronograma de Planejamento Semanal</summary><p>O ciclo ocorre entre quarta e sexta-feira: lançar folgas, executar Generate Week, ajustar manualmente, incluir serviços extras e submeter o planejamento até sexta-feira.</p></details>
+          <details><summary>B. Motoristas Reservas / Spare Drivers</summary><p>Spare Drivers não recebem rota automática no Generate Week. Eles permanecem disponíveis para alocação manual conforme a necessidade diária.</p></details>
+          <details><summary>C. Serviços Extras / Ad-Hoc Services</summary><p>Quando confirmados entre quarta e quinta, devem ser inseridos via Add Ad-Hoc, informando tipo de serviço, motorista e dias específicos.</p></details>
+          <details><summary>D. Política de Solicitação de Folgas</summary><p>Para entrar no fluxo normal, a folga deve ser solicitada antes de quinta-feira da semana anterior. Pedidos tardios entram em análise de exceção.</p></details>
+          <details><summary>E. Segurança de Acesso ao Daily Game Plan</summary><p>O sistema bloqueia edição do DGP para usuários que não estejam autorizados como líderes do depósito naquela data. O Admin User mantém acesso global.</p></details>
+        </div>
+      </section>
+    </main>
+
+    <footer class="container">Arquivo HTML único · Dashboard visual do Week Planner</footer>
+  </div>
+
+  <!-- ===================== MOBILE (ilhas) ===================== -->
+  <div class="mobile">
+    <div class="app">
+      <div class="topbar">
+        <div class="avatar"><svg class="ico"><use href="#i-calendar"/></svg></div>
+        <div><h1>Week Planner</h1><p>Dashboard operacional · Módulo 7</p></div>
+      </div>
+
+      <div class="section-label"><svg class="ico"><use href="#i-home"/></svg> Visão geral</div>
+      <section class="view" id="view-home">
+        <div class="island m-hero">
+          <span class="eyebrow-m"><svg class="ico"><use href="#i-calendar"/></svg> SEMANA SEGUINTE</span>
+          <h3>Planejamento logístico-financeiro</h3>
+          <p>Grade de 7 dias que define a escala: motoristas, veículos, depósitos, rotas e folgas — tudo organizado com antecedência.</p>
+        </div>
+        <div class="island">
+          <h2>Indicadores <span class="tag">tempo real</span></h2>
+          <div class="kpis">
+            <div class="kpi"><div class="num">7</div><span>dias em grade operacional</span></div>
+            <div class="kpi"><div class="num">3</div><span>dias-chave: quarta a sexta</span></div>
+            <div class="kpi"><div class="num">2</div><span>modos: Save e Assign All Week</span></div>
+            <div class="kpi"><div class="num">100%</div><span>proteção do histórico</span></div>
+          </div>
+        </div>
+        <div class="island">
+          <h2>Recursos principais</h2>
+          <div class="feat">
+            <div class="feat-row"><div class="feat-ic"><svg class="ico"><use href="#i-cursor"/></svg></div><div><strong>Interface dinâmica</strong><p>Monte rotas com Drag & Drop.</p></div></div>
+            <div class="feat-row"><div class="feat-ic"><svg class="ico"><use href="#i-gear"/></svg></div><div><strong>Generate Week</strong><p>Preenche motoristas fixos num clique.</p></div></div>
+            <div class="feat-row"><div class="feat-ic"><svg class="ico"><use href="#i-copy"/></svg></div><div><strong>Copy to Next Week</strong><p>Duplica a escala atual.</p></div></div>
+            <div class="feat-row"><div class="feat-ic"><svg class="ico"><use href="#i-umbrella"/></svg></div><div><strong>Day-Off Spare</strong><p>Cria folga automática p/ conformidade.</p></div></div>
+            <div class="feat-row"><div class="feat-ic"><svg class="ico"><use href="#i-lock"/></svg></div><div><strong>Trava temporal</strong><p>Datas passadas ficam read-only.</p></div></div>
+          </div>
+        </div>
+      </section>
+
+      <div class="section-label"><svg class="ico"><use href="#i-layers"/></svg> Fluxo</div>
+      <section class="view" id="view-flow">
+        <div class="island">
+          <h2>Cronograma semanal <span class="tag">qua → sex</span></h2>
+          <div class="steps">
+            <div class="step"><div class="badge">1</div><div><strong>Lançar folgas</strong><p>Antes do Generate Week, para evitar alocação indevida.</p></div></div>
+            <div class="step"><div class="badge">2</div><div><strong>Gerar semana</strong><p>Admin User cria a base das alocações fixas.</p></div></div>
+            <div class="step"><div class="badge">3</div><div><strong>Ajustar manualmente</strong><p>Reservas, serviços extras e ajustes de frota.</p></div></div>
+            <div class="step"><div class="badge">4</div><div><strong>Submeter até sexta</strong><p>Depois do prazo vira exceção com justificativa.</p></div></div>
+          </div>
+        </div>
+        <div class="island">
+          <h2>Regras de negócio</h2>
+          <details open><summary>A. Cronograma semanal</summary><p>Quarta a sexta: folgas, Generate Week, ajustes, serviços extras e submissão até sexta.</p></details>
+          <details><summary>B. Spare Drivers</summary><p>Não recebem rota automática. Ficam disponíveis para alocação manual.</p></details>
+          <details><summary>C. Serviços Ad-Hoc</summary><p>Inseridos via Add Ad-Hoc com tipo, motorista e dias específicos.</p></details>
+          <details><summary>D. Solicitação de folgas</summary><p>Antes de quinta da semana anterior. Tardias entram em exceção.</p></details>
+          <details><summary>E. Segurança do DGP</summary><p>Bloqueia edição de não-líderes do depósito. Admin User tem acesso global.</p></details>
+        </div>
+      </section>
+
+      <div class="section-label"><svg class="ico"><use href="#i-chart"/></svg> Métricas</div>
+      <section class="view" id="view-stats">
+        <div class="island" id="barIsland">
+          <h2>Peso dos recursos</h2>
+          <div class="bars">
+            <div class="m-bar-row"><div class="bar-top"><span>Automação</span><b>92%</b></div><div class="m-bar-track"><div class="m-bar-fill" style="--w:92%"></div></div></div>
+            <div class="m-bar-row"><div class="bar-top"><span>Segurança</span><b>88%</b></div><div class="m-bar-track"><div class="m-bar-fill" style="--w:88%"></div></div></div>
+            <div class="m-bar-row"><div class="bar-top"><span>Produtividade</span><b>84%</b></div><div class="m-bar-track"><div class="m-bar-fill" style="--w:84%"></div></div></div>
+            <div class="m-bar-row"><div class="bar-top"><span>Flexibilidade</span><b>76%</b></div><div class="m-bar-track"><div class="m-bar-fill" style="--w:76%"></div></div></div>
+            <div class="m-bar-row"><div class="bar-top"><span>Exceções</span><b>62%</b></div><div class="m-bar-track"><div class="m-bar-fill" style="--w:62%"></div></div></div>
+          </div>
+        </div>
+        <div class="island" id="donutIsland">
+          <h2>Composição do fluxo</h2>
+          <div class="donut-box">
+            <div class="m-donut" aria-label="Gráfico de rosca do fluxo"></div>
+            <div class="m-legend">
+              <div><span class="dot" style="--c:var(--blue)"></span>30% Alocações fixas</div>
+              <div><span class="dot" style="--c:var(--green)"></span>25% Ajustes manuais</div>
+              <div><span class="dot" style="--c:var(--yellow)"></span>20% Folgas e reservas</div>
+              <div><span class="dot" style="--c:var(--purple)"></span>15% Ad-Hoc</div>
+              <div><span class="dot" style="--c:var(--red)"></span>10% Exceções</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div class="section-label"><svg class="ico"><use href="#i-calendar"/></svg> Semana</div>
+      <section class="view" id="view-week">
+        <div class="island">
+          <h2>Grade da semana <span class="tag">deslize →</span></h2>
+          <div class="week">
+            <div class="m-day"><h4>Segunda</h4><span class="pill">Rotas fixas</span><span class="pill green">Motoristas ativos</span></div>
+            <div class="m-day"><h4>Terça</h4><span class="pill">Rotas fixas</span><span class="pill yellow">Ajustes pontuais</span></div>
+            <div class="m-day"><h4>Quarta</h4><span class="pill green">Início do ciclo</span><span class="pill yellow">Ad-Hoc provável</span></div>
+            <div class="m-day"><h4>Quinta</h4><span class="pill yellow">Prazo de folgas</span><span class="pill green">Serviços extras</span></div>
+            <div class="m-day"><h4>Sexta</h4><span class="pill green">Submissão final</span><span class="pill red">Exceções após prazo</span></div>
+            <div class="m-day"><h4>Sábado</h4><span class="pill">Execução planejada</span><span class="pill yellow">Monitoramento</span></div>
+            <div class="m-day"><h4>Domingo</h4><span class="pill">Execução planejada</span><span class="pill green">Fechamento</span></div>
+          </div>
+          <div class="swipe-hint">← deslize para ver todos os dias →</div>
+        </div>
+      </section>
+
+      <div class="section-label"><svg class="ico"><use href="#i-shield"/></svg> Acesso</div>
+      <section class="view" id="view-access">
+        <div class="island">
+          <h2>Níveis de acesso</h2>
+          <div class="acc">
+            <div class="acc-item"><div class="acc-ic"><svg class="ico"><use href="#i-clock"/></svg></div><div><strong>Trava temporal</strong><p>Edição só em datas futuras; atuais e passadas read-only.</p></div></div>
+            <div class="acc-item"><div class="acc-ic"><svg class="ico"><use href="#i-building"/></svg></div><div><strong>Controle por depósito</strong><p>Acesso só à base designada para o dia.</p></div></div>
+            <div class="acc-item"><div class="acc-ic"><svg class="ico"><use href="#i-shield"/></svg></div><div><strong>Acesso global</strong><p>Admin User acessa tudo via BAOP.</p></div></div>
+          </div>
+        </div>
+        <div class="island alert">
+          <h2><svg class="ico"><use href="#i-alert"/></svg> Pontos críticos</h2>
+          <p><b>Folgas antes do Generate Week.</b> Senão o motorista pode ir pra rota padrão indevidamente.</p>
+          <p><b>Serviços de última hora não passam pelo Week Planner.</b> Vão direto ao Daily Game Plan.</p>
+          <p><b>Acesso ao DGP é validado por depósito e data.</b> Não autorizados são bloqueados.</p>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    // ===== DESKTOP: scroll reveal + animação de gráficos =====
+    (function () {
+      var items = document.querySelectorAll('.reveal');
+      if (!('IntersectionObserver' in window)) { items.forEach(function (el){ el.classList.add('in-view'); }); return; }
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          if (e.isIntersecting) { e.target.classList.add('in-view'); io.unobserve(e.target); }
+        });
+      }, { threshold: 0.18, rootMargin: '0px 0px -40px 0px' });
+      items.forEach(function (el) { io.observe(el); });
+    })();
+
+    // ===== MOBILE: anima gráficos ao entrar na viewport =====
+    (function () {
+      var targets = [document.getElementById('barIsland'), document.getElementById('donutIsland')].filter(Boolean);
+      if (!targets.length) return;
+      if (!('IntersectionObserver' in window)) { targets.forEach(function (el){ el.classList.add('visible'); }); return; }
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); }
+        });
+      }, { threshold: 0.25, rootMargin: '0px 0px -40px 0px' });
+      targets.forEach(function (el) { io.observe(el); });
+    })();
+  </script>
+</body>
+</html>
