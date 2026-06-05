@@ -357,6 +357,15 @@
   .ltable .ar{color:var(--accent-2);font-weight:800;margin:0 4px}
   .ltable code{background:rgba(17,184,166,.14);padding:2px 8px;border-radius:6px;
     font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;color:#0c8576;font-weight:600}
+  /* role columns in the access matrix */
+  .ltable th.rc,.ltable td.rc{text-align:center;white-space:nowrap}
+  .ltable td.rc{font-size:15px;color:var(--ink);font-weight:700}
+  .ltable td.rc small{display:block;font-size:10.5px;font-weight:500;color:var(--ink-faint);letter-spacing:.02em}
+  .ltable td.path{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;
+    color:#0c8576;font-weight:600;white-space:nowrap}
+  /* profile id chip */
+  .uid{display:inline-grid;place-items:center;width:26px;height:26px;border-radius:8px;font-size:13px;font-weight:800;
+    color:#fff;background:linear-gradient(120deg,var(--accent),var(--accent-2))}
 
   /* ---------- SEVERITY BADGES + CAUTION LIST ---------- */
   .sev{display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:800;
@@ -478,7 +487,7 @@
     <p class="lede">A single ecosystem that integrates planning, field execution, auditing,
       performance and billing — built so every module works connected, end to end.</p>
     <div class="hero-stats">
-      <div class="stat"><b>13</b><span>Modules</span></div>
+      <div class="stat"><b>15</b><span>Modules</span></div>
       <div class="stat"><b>4</b><span>Depots</span></div>
       <div class="stat"><b>3</b><span>Access Levels</span></div>
       <div class="stat"><b>1</b><span>Platform</span></div>
@@ -492,6 +501,8 @@
         <svg viewBox="0 0 24 24"><path d="M3 12h7V3H3zM14 21h7v-9h-7zM14 3v6h7V3zM3 21h7v-6H3z"/></svg>Overview</button>
       <button class="tab" data-tab="access">
         <svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>Access &amp; Security</button>
+      <button class="tab" data-tab="roles">
+        <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>Roles &amp; Access</button>
       <button class="tab" data-tab="data">
         <svg viewBox="0 0 24 24"><ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v6c0 1.7 3.6 3 8 3s8-1.3 8-3V6M4 12v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"/></svg>Master Data</button>
       <button class="tab" data-tab="ops">
@@ -648,6 +659,148 @@
     </section>
 
     <!-- =================================================================
+         ROLES & ACCESS  (user types · 3-layer control · access matrix)
+    ================================================================== -->
+    <section class="panel" id="roles">
+      <div class="panel-head"><span class="num">01·5</span><h2>Roles &amp; the Access Matrix</h2></div>
+      <p class="panel-intro">Logixsphere has three user types, identified by the <code>user_type_id</code> carried inside the
+        JWT token. Everything a person can see or do flows from that single number. This is the map of who reaches
+        what — page by page.</p>
+
+      <div class="grid">
+
+        <!-- 1 · the three profiles -->
+        <div class="card wide">
+          <div class="ic"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+          <h3>Three user profiles</h3>
+          <p style="margin-bottom:16px">One field in the token decides the entire experience. There are no sub-roles —
+            just these three.</p>
+          <div class="tbl-wrap" style="margin:0">
+            <table class="ltable">
+              <thead><tr><th>Profile</th><th class="rc">user_type_id</th><th>In one sentence</th></tr></thead>
+              <tbody>
+                <tr><td>Admin</td><td class="rc"><span class="uid">1</span></td><td>System owner: master data + planning + execution + finance + users. No fences.</td></tr>
+                <tr><td>Driver / Vendor</td><td class="rc"><span class="uid">2</span></td><td>The field provider: sees their own performance, their own invoices and their own requests.</td></tr>
+                <tr><td>Supervisor</td><td class="rc"><span class="uid">3</span></td><td>Operations manager: plans and executes like the Admin, but with no finance and no master data.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- 2 · three layers of control -->
+        <div class="card wide">
+          <div class="ic"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+          <h3>Control happens in three layers</h3>
+          <div class="steps" style="margin-top:8px">
+            <div class="step"><p><strong>Frontend — screen whitelist (the main barrier).</strong> The middleware reads
+              <code>user_type_id</code> on every page request. Admin passes straight through; a Vendor only reaches its
+              allow-list, anything else redirects to <code>/daily-performance-insight</code>; a Supervisor only reaches
+              its allow-list, anything else redirects to <code>/daily-game-plan</code>.</p></div>
+            <div class="step"><p><strong>Frontend — sidebar assembly.</strong> The side bar hides whole sections per
+              profile: the Supervisor sees neither the Finance section nor master data; the Vendor sees almost nothing
+              beyond its own world.</p></div>
+            <div class="step"><p><strong>Backend — route middlewares.</strong> Each endpoint demands a level:
+              <code>authenticateAdminJWT</code> (Admin only — 85 endpoints: all master data, all finance, mass deletes,
+              request approval), <code>authenticateAdminOrSupervisorJWT</code> (Admin or Supervisor — 26 endpoints:
+              planning, game plan, operation transitions), and <code>authenticateJWT</code> (any authenticated user —
+              most read GETs).</p></div>
+          </div>
+          <div class="callout" style="margin-top:18px">
+            <svg viewBox="0 0 24 24"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg>
+            <div><h4>Security note — the real barrier is the frontend</h4><p>Most <strong>read (GET)</strong> routes use
+              only <code>authenticateJWT</code>, so at the API level any logged-in user could <em>read</em> a lot. What
+              actually stops a Vendor from reaching admin screens is the frontend whitelist, not the backend. The true
+              data locks in the backend are pointed and specific (see below).</p></div>
+          </div>
+        </div>
+
+        <!-- 3 · the full access matrix -->
+        <div class="card wide" style="padding-bottom:14px">
+          <div class="ic"><svg viewBox="0 0 24 24"><path d="M3 3h18v18H3z"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/></svg></div>
+          <h3>The access matrix — every page, every profile</h3>
+          <p style="margin-bottom:6px">Legend: <strong>✅</strong> full access · <strong>🟡</strong> restricted (own data /
+            subset / read-only) · <strong>🚫</strong> blocked (redirected or hidden).</p>
+        </div>
+        <div class="tbl-wrap">
+          <table class="ltable">
+            <thead><tr><th>Page</th><th>What it does</th><th class="rc">Admin</th><th class="rc">Supervisor</th><th class="rc">Vendor</th></tr></thead>
+            <tbody>
+              <tr><td class="path">/</td><td>Login — entry point</td><td class="rc">✅</td><td class="rc">✅</td><td class="rc">✅</td></tr>
+              <tr><td class="path">/home</td><td>Portal / quick access</td><td class="rc">✅</td><td class="rc">✅</td><td class="rc">🚫</td></tr>
+              <tr><td class="path">/vendor</td><td>Vendor registry</td><td class="rc">✅</td><td class="rc">🚫</td><td class="rc">🚫</td></tr>
+              <tr><td class="path">/vehicles</td><td>Vehicle registry</td><td class="rc">✅</td><td class="rc">🚫</td><td class="rc">🚫</td></tr>
+              <tr><td class="path">/contract-management</td><td>Contracts</td><td class="rc">✅</td><td class="rc">🚫</td><td class="rc">🚫</td></tr>
+              <tr><td class="path">/assets</td><td>Auxiliary registries</td><td class="rc">✅</td><td class="rc">🚫</td><td class="rc">🚫</td></tr>
+              <tr><td class="path">/week-planner</td><td>Weekly planning</td><td class="rc">✅</td><td class="rc">✅</td><td class="rc">🚫</td></tr>
+              <tr><td class="path">/daily-game-plan</td><td>Day operational plan</td><td class="rc">✅</td><td class="rc">✅</td><td class="rc">🚫</td></tr>
+              <tr><td class="path">/daily-operations-management</td><td>Daily ops management</td><td class="rc">✅</td><td class="rc">🟡<small>via API</small></td><td class="rc">🚫</td></tr>
+              <tr><td class="path">/daily-operations-reports</td><td>Operational insights</td><td class="rc">✅</td><td class="rc">✅</td><td class="rc">🚫</td></tr>
+              <tr><td class="path">/vendor-performance</td><td>Vendor performance</td><td class="rc">✅</td><td class="rc">✅</td><td class="rc">🚫</td></tr>
+              <tr><td class="path">/daily-performance-insight</td><td>Daily performance</td><td class="rc">✅</td><td class="rc">✅</td><td class="rc">✅<small>landing</small></td></tr>
+              <tr><td class="path">/current-performance</td><td>Current performance</td><td class="rc">✅</td><td class="rc">✅</td><td class="rc">🟡<small>own</small></td></tr>
+              <tr><td class="path">/current-month</td><td>Month summary</td><td class="rc">✅</td><td class="rc">✅</td><td class="rc">🟡<small>own</small></td></tr>
+              <tr><td class="path">/subcontractor</td><td>Subcontractor view</td><td class="rc">✅</td><td class="rc">✅</td><td class="rc">🟡<small>own</small></td></tr>
+              <tr><td class="path">/mobile-invoice</td><td>Invoices (mobile)</td><td class="rc">✅</td><td class="rc">✅</td><td class="rc">🟡<small>own</small></td></tr>
+              <tr><td class="path">/deductions</td><td>Deductions (operational)</td><td class="rc">✅</td><td class="rc">🟡<small>own</small></td><td class="rc">🟡<small>own</small></td></tr>
+              <tr><td class="path">/requests</td><td>Create / track requests</td><td class="rc">✅</td><td class="rc">✅</td><td class="rc">✅</td></tr>
+              <tr><td class="path">/requests-inbox</td><td>Requests inbox</td><td class="rc">✅</td><td class="rc">✅</td><td class="rc">🚫</td></tr>
+              <tr><td class="path">/financial-invoices</td><td>Invoices (management)</td><td class="rc">✅</td><td class="rc">🚫</td><td class="rc">🚫</td></tr>
+              <tr><td class="path">/adhoc-works-invoice-management</td><td>Ad-hoc billing</td><td class="rc">✅</td><td class="rc">🚫</td><td class="rc">🚫</td></tr>
+              <tr><td class="path">/deductions-disbursements-recharges</td><td>Financial deductions</td><td class="rc">✅</td><td class="rc">🚫</td><td class="rc">🚫</td></tr>
+              <tr><td class="path">/daily-financial-insights</td><td>Financial insights</td><td class="rc">✅</td><td class="rc">🚫</td><td class="rc">🚫</td></tr>
+              <tr><td class="path">/service-partner-invoices</td><td>Invoices per Service Partner</td><td class="rc">✅</td><td class="rc">🚫</td><td class="rc">🚫</td></tr>
+              <tr><td>Legacy ⚠️ pages</td><td>Variants / prototypes (see Best Practices)</td><td class="rc">✅</td><td class="rc">🚫</td><td class="rc">🚫</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- 4 · backend data-level locks -->
+        <div class="card wide">
+          <div class="ic"><svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></div>
+          <h3>Where the backend really locks data</h3>
+          <p style="margin-bottom:6px">Beyond the screen whitelist, four specific guards enforce data ownership at the API:</p>
+          <ul class="cautions">
+            <li><span class="sev crit"><span class="d"></span>Anti-IDOR</span><p><strong>Deductions.</strong> Vendor and Supervisor read only their own — swapping the <code>:userId</code> in the URL returns <strong>403</strong>. Only the Admin reads other people's.</p></li>
+            <li><span class="sev warn"><span class="d"></span>Scoped</span><p><strong>Service Partner.</strong> Vendor and Supervisor are pinned to the SP in their own token; only the Admin picks an arbitrary SP via query.</p></li>
+            <li><span class="sev warn"><span class="d"></span>Scoped</span><p><strong>Week Planner exports.</strong> Admin and Supervisor export any user's data; the Vendor exports only their own.</p></li>
+            <li><span class="sev minor"><span class="d"></span>Scoped</span><p><strong>Chat.</strong> The Vendor talks only to Admin / Supervisor; Admin and Supervisor talk to everyone.</p></li>
+          </ul>
+        </div>
+
+        <!-- 5 · pocket map per profile -->
+        <div class="card wide">
+          <div class="ic"><svg viewBox="0 0 24 24"><path d="M9 20l-5.5 2.5V5L9 2.5m0 17.5 6-3m-6 3V2.5m6 14.5 5.5 2.5V4.5L15 2m0 14.5V2m0 0L9 5"/></svg></div>
+          <h3>Pocket map — what each profile lives in</h3>
+          <div class="grid" style="gap:14px;margin-top:18px">
+            <div class="card reveal" style="opacity:1;transform:none">
+              <span class="tag" style="margin:0 0 10px">👤 Vendor · type 2</span>
+              <p>Lives in its own world. Sees only: <code>daily-performance-insight</code> (landing),
+                <code>subcontractor</code>, <code>deductions</code> (own), <code>current-month</code>,
+                <code>current-performance</code>, <code>mobile-invoice</code> (own) and <code>requests</code>.
+                Any other route → back to <code>daily-performance-insight</code>. In chat, talks only to Admin/Supervisor.</p>
+            </div>
+            <div class="card reveal" style="opacity:1;transform:none">
+              <span class="tag" style="margin:0 0 10px">👔 Supervisor · type 3</span>
+              <p>Operations manager without a wallet. Everything the Vendor has <strong>plus</strong> <code>home</code>,
+                <code>week-planner</code> (incl. Generate Week), <code>daily-game-plan</code>,
+                <code>daily-operations-reports</code>, <code>vendor-performance</code> and <code>requests-inbox</code>.
+                <strong>No finance, no master data, no request approval, and reads only its own deductions.</strong>
+                Off-list route → back to <code>daily-game-plan</code>.</p>
+            </div>
+            <div class="card reveal" style="opacity:1;transform:none">
+              <span class="tag" style="margin:0 0 10px">🛡️ Admin · type 1</span>
+              <p>No fences. All official pages <strong>and</strong> the legacy ⚠️ ones. The only profile that creates/edits
+                master data, runs all finance, manages users, approves requests, mass-deletes, sees anyone's data and
+                crosses the Service Partner boundary. The trade-off: on mass, irreversible and financial actions the
+                <strong>Admin is the last check that exists</strong>.</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- =================================================================
          MASTER DATA  (Vendors, Contracts, Assets)
     ================================================================== -->
     <section class="panel" id="data">
@@ -790,6 +943,28 @@
               marks records as <em>Submitted</em>, locking edits and releasing data for official invoices.</p></div>
           </div>
         </div>
+
+        <div class="card wide">
+          <div class="ic"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+          <h3>14 · Requests — the field channel</h3>
+          <p>Where any user creates and tracks their own requests (vendor requests) — the way a driver asks for
+            something: a deduction, a correction, a day off, an ad-hoc need. <strong>All three profiles</strong>
+            (Admin, Supervisor, Vendor) reach this screen; it is the Vendor's single channel to management.</p>
+          <span class="tag">Open to everyone</span>
+        </div>
+
+        <div class="card wide">
+          <div class="ic"><svg viewBox="0 0 24 24"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg></div>
+          <h3>15 · Requests Inbox — management side</h3>
+          <p>The inbox where incoming requests are managed, with a month selector and a badge counting the current
+            month's pending items. Admin and Supervisor both see the inbox (the sidebar counts pendencies for both);
+            the Vendor has no access.</p>
+          <div class="callout" style="margin-top:18px">
+            <svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+            <div><h4>Approval is Admin-only</h4><p>Approving, editing or deleting a request is <strong>exclusive to the
+              Admin</strong>. The Supervisor sees the inbox, but the final decision belongs to the Admin.</p></div>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -830,6 +1005,30 @@
             <div class="kpi"><div class="k">Avg SPR</div><p>Package &amp; stop volume.</p><div class="bar"><i style="--w:74%"></i></div></div>
             <div class="kpi"><div class="k">Avg SPOR-H</div><p>Adjusted hourly agility.</p><div class="bar"><i style="--w:66%"></i></div></div>
             <div class="kpi"><div class="k">Avg AFD</div><p>Failures, misses &amp; occurrences.</p><div class="bar"><i style="--w:52%"></i></div></div>
+          </div>
+        </div>
+
+        <div class="card wide">
+          <div class="ic"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+          <h3>The driver's self-service area</h3>
+          <p style="margin-bottom:16px">The same analytics, narrowed to a single person. These are the screens a Vendor
+            actually lands on — each one scoped to <strong>their own data only</strong>. Admin and Supervisor see the
+            broad version of all of them.</p>
+          <div class="grid" style="gap:14px">
+            <div class="card reveal" style="opacity:1;transform:none"><h3 style="font-size:15px">Daily Performance Insight</h3><p>The Vendor's landing page and the fallback every blocked route redirects to. Day-by-day performance view.</p></div>
+            <div class="card reveal" style="opacity:1;transform:none"><h3 style="font-size:15px">Current Performance</h3><p>Performance for the running period — monthly averages plus a daily breakdown. Vendor sees their own.</p></div>
+            <div class="card reveal" style="opacity:1;transform:none"><h3 style="font-size:15px">Current Month</h3><p>A summary of the running month for the user.</p></div>
+          </div>
+        </div>
+
+        <div class="card wide">
+          <div class="ic"><svg viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/></svg></div>
+          <h3>Subcontractor &amp; Mobile Invoice</h3>
+          <p style="margin-bottom:16px">The two screens where the driver follows their own month and their own pay — both
+            mobile-friendly, both restricted to the signed-in Vendor.</p>
+          <div class="grid" style="gap:14px">
+            <div class="card reveal" style="opacity:1;transform:none"><h3 style="font-size:15px">Subcontractor</h3><p>Month selector, day carousel and detail — where the Vendor tracks their own operation across the month.</p></div>
+            <div class="card reveal" style="opacity:1;transform:none"><h3 style="font-size:15px">Mobile Invoice</h3><p>List and detail of invoices in a mobile statement format — where the Vendor sees their own invoices (<em>My Payslips</em>).</p></div>
           </div>
         </div>
       </div>
@@ -891,6 +1090,46 @@
               The <strong>Administrator is the only profile</strong> with full financial access — closing,
               checking, issuing and auditing invoices.</p></div>
           </div>
+        </div>
+
+        <div class="card wide">
+          <div class="ic"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div>
+          <h3>Two deduction screens — don't confuse them</h3>
+          <p style="margin-bottom:16px">The system has two distinct deduction surfaces. Mixing them up is a common source
+            of confusion:</p>
+          <div class="grid" style="gap:14px">
+            <div class="card reveal" style="opacity:1;transform:none">
+              <span class="tag" style="margin:0 0 10px">Operational · <code>/deductions</code></span>
+              <p>A consultation view of the deductions applied to a user. Admin sees anyone's and can pick an arbitrary
+                Service Partner; Supervisor and Vendor see only their own (403 on another userId — the anti-IDOR lock).</p>
+            </div>
+            <div class="card reveal" style="opacity:1;transform:none">
+              <span class="tag" style="margin:0 0 10px">Financial · <code>/deductions-disbursements-recharges</code></span>
+              <p>The Admin-only financial screen that gathers the <strong>five deduction types</strong> plus disbursements
+                and recharges. Hidden from Supervisor and Vendor entirely.</p>
+            </div>
+          </div>
+          <div class="pills" style="margin-top:16px">
+            <div class="pill">Fix Damage</div><div class="pill">Liquidation Damage</div><div class="pill">Traffic Penalty</div>
+            <div class="pill">Pre-Payment</div><div class="pill">Other</div>
+          </div>
+        </div>
+
+        <div class="card wide">
+          <div class="ic"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M12 18v-6M9 15h6"/></svg></div>
+          <h3>Ad-Hoc Works Invoice Management</h3>
+          <p>Billing for the extra, off-route (ad-hoc) services that the master data auto-classifies upstream. An
+            Admin-only screen — Supervisor and Vendor never see it.</p>
+          <span class="tag">Admin only</span>
+        </div>
+
+        <div class="card wide">
+          <div class="ic"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg></div>
+          <h3>Service Partner Invoices</h3>
+          <p>Monthly invoices grouped by Service Partner, rendered as a document with the SP's header (a snapshot saved
+            at issuance, with a live fallback for legacy records) and exportable to PDF. The billable operations are
+            sourced from the operations-management module. Sits outside the main sidebar — Admin only.</p>
+          <span class="tag">Admin only · PDF export</span>
         </div>
       </div>
     </section>
@@ -1060,6 +1299,37 @@
               <tr><td>"The day won't open"</td><td>There's a pendency in the last 7 days, or no leader assigned to the depot.</td></tr>
               <tr><td>"The invoice came out with the wrong amount"</td><td>Payment model or rate band registered incorrectly.</td></tr>
               <tr><td>"I can't delete a vehicle"</td><td>It's a system vehicle (e.g., a day-off marker).</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="card wide">
+          <div class="ic"><svg viewBox="0 0 24 24"><path d="M12 9v4M12 17h.01"/><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg></div>
+          <h3>Legacy &amp; direct-access pages ⚠️</h3>
+          <p>The product went through successive iterations, so operations, finance and invoices each carry 3–4
+            overlapping screens. These pages <strong>still exist in the code and open by URL</strong>, but they sit
+            outside the navigation. Because the Admin has no whitelist, the Admin can still reach them — Supervisor and
+            Vendor cannot (the middleware redirects). <strong>Always use the sidebar items</strong>, which point to the
+            supported version. These are natural candidates for consolidation/removal.</p>
+        </div>
+        <div class="tbl-wrap">
+          <table class="ltable">
+            <thead><tr><th>Legacy page</th><th>What it is (title in code)</th><th>Supported version</th></tr></thead>
+            <tbody>
+              <tr><td class="path">/op-management</td><td>Daily Operations Management — route &amp; vendor management</td><td class="path">/daily-operations-management</td></tr>
+              <tr><td class="path">/operations-management</td><td>Operations management (ModernPageHeader variant)</td><td class="path">/daily-operations-management</td></tr>
+              <tr><td class="path">/op-dashboard</td><td>Operations Dashboard (totals, active ad-hoc)</td><td class="path">/daily-operations-reports</td></tr>
+              <tr><td class="path">/logistics</td><td>Loops &amp; Routes (loop/route management)</td><td>route master data</td></tr>
+              <tr><td class="path">/daily</td><td>Daily dashboard (demo data)</td><td class="path">/daily-game-plan</td></tr>
+              <tr><td class="path">/schedule</td><td>Schedule for Payment (payment agenda)</td><td>finance module</td></tr>
+              <tr><td class="path">/week-planner-operations</td><td>Operational planner prototype (placeholder)</td><td class="path">/week-planner</td></tr>
+              <tr><td class="path">/performance</td><td>Personal performance (month carousel)</td><td class="path">/current-performance</td></tr>
+              <tr><td class="path">/invoice-history</td><td>Invoice Processing / History</td><td class="path">/financial-invoices</td></tr>
+              <tr><td class="path">/invoice-processing-workflow</td><td>Invoice Processing (workflow)</td><td class="path">/financial-invoices</td></tr>
+              <tr><td class="path">/financial-management</td><td>Financial Management (panel)</td><td class="path">/financial-invoices</td></tr>
+              <tr><td class="path">/financial-performance</td><td>Financial Management — Performance Metrics</td><td class="path">/daily-financial-insights</td></tr>
+              <tr><td class="path">/daily-financials</td><td>Daily Financials (with datepicker)</td><td class="path">/daily-financial-insights</td></tr>
+              <tr><td class="path">/requests-admin</td><td>Requests Management (Pending / History)</td><td class="path">/requests-inbox</td></tr>
             </tbody>
           </table>
         </div>
