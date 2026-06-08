@@ -599,6 +599,56 @@
 
           </div>
         </div>
+
+        <div class="card wide">
+          <div class="ic"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></div>
+          <h3>Why the system is split in two layers</h3>
+          <p>All the business logic — financial calculations, validations and the operations state machine — lives in the
+            <strong>backend</strong>. The <strong>frontend</strong> (including the driver's mobile app) is just a window:
+            it shows data and triggers actions, but <strong>never calculates money</strong>. This is a business decision
+            as much as a technical one — it keeps the financial "truth" in a single place, auditable and versioned.</p>
+          <div class="callout info" style="margin-top:18px">
+            <svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+            <div><h4>A single source of truth</h4><p>Every hour and every amount is computed once, server-side, and reused
+              across operations, auditing and billing — so figures never diverge between teams or spreadsheets.</p></div>
+          </div>
+        </div>
+
+        <div class="card wide">
+          <div class="ic"><svg viewBox="0 0 24 24"><path d="M12 2 2 7l10 5 10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
+          <h3>The data pyramid — four floors that hold each other up</h3>
+          <p style="margin-bottom:18px">The platform is organised as four floors built bottom-up. An error on a lower
+            floor — say, a vendor with no route — <strong>automatically corrupts everything above it</strong>, all the
+            way to the invoice. That is why master data is taken so seriously.</p>
+          <div class="lifecycle">
+            <div class="lc-stage">1 · Master Data<span>the foundation</span></div>
+            <div class="lc-arrow">→</div>
+            <div class="lc-stage">2 · Planning<span>the week's intent</span></div>
+            <div class="lc-arrow">→</div>
+            <div class="lc-stage">3 · Execution<span>the real day</span></div>
+            <div class="lc-arrow">→</div>
+            <div class="lc-stage end">4 · Finance<span>auditable money</span></div>
+          </div>
+        </div>
+
+        <div class="card wide">
+          <div class="ic"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg></div>
+          <h3>The four pillars of trust</h3>
+          <p style="margin-bottom:16px">Why leadership can rely on the numbers this platform produces:</p>
+          <div class="grid" style="gap:14px">
+            <div class="card reveal" style="opacity:1;transform:none"><h3 style="font-size:15px">🎯 Single source of truth</h3><p>Every money and hour calculation lives in the backend, versioned and auditable. The app is only the window.</p></div>
+            <div class="card reveal" style="opacity:1;transform:none"><h3 style="font-size:15px">🔐 Two-layer security</h3><p>Screen and API verify the profile independently — it is not enough to "hide the button".</p></div>
+            <div class="card reveal" style="opacity:1;transform:none"><h3 style="font-size:15px">🛡️ History protection</h3><p>Past dates are read-only, finished operations never regress, and auditing locks before data becomes money.</p></div>
+            <div class="card reveal" style="opacity:1;transform:none"><h3 style="font-size:15px">🤖 Automations vs. human error</h3><p>Invisible day off, synthetic line, bank-working-day dates and automatic week generation.</p></div>
+          </div>
+        </div>
+
+        <div class="callout info">
+          <svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          <div><h4>Full traceability, end to end</h4><p>The same data enters as "intent" on Monday and leaves as "amount
+            payable" on the month's invoice — with readable serial codes, automatic "Paid" status and an audit trail at
+            every step. No re-typing, no parallel spreadsheet.</p></div>
+        </div>
       </div>
     </section>
 
@@ -861,6 +911,62 @@
             <div class="card reveal" style="opacity:1;transform:none"><h3 style="font-size:15px">AdHoc Category</h3><p>Categories later used in invoices, reports &amp; financial classification.</p></div>
           </div>
         </div>
+
+        <div class="card wide">
+          <div class="ic"><svg viewBox="0 0 24 24"><path d="M3 3h18v18H3z"/><path d="M3 9h18M9 21V9"/></svg></div>
+          <h3>The three Vendor fields that decide everything</h3>
+          <p style="margin-bottom:6px">Three fields on the Vendor record silently govern whether a driver ever reaches the
+            schedule. The most common support question — <em>"the driver disappeared from planning"</em> — is almost
+            always one of these three.</p>
+          <div class="tbl-wrap" style="margin-top:14px">
+            <table class="ltable">
+              <thead><tr><th>Field</th><th>What it controls</th></tr></thead>
+              <tbody>
+                <tr><td>Route</td><td>The default route used by <strong>Generate Week</strong>. No route = the driver is never auto-allocated.</td></tr>
+                <tr><td>Type</td><td>Position &amp; vehicle type. The special <code>Spare</code> type is deliberately left out of auto-allocation.</td></tr>
+                <tr><td>Status</td><td>Active / inactive. Inactive drivers are skipped by the planner entirely.</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="callout" style="margin-top:18px">
+            <svg viewBox="0 0 24 24"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg>
+            <div><h4>#1 support question</h4><p>"The driver vanished from planning" → the record is <strong>inactive</strong>,
+              has <strong>no route</strong>, or is a <strong>Spare</strong> type. The system is behaving correctly — the
+              data is incomplete.</p></div>
+          </div>
+        </div>
+
+        <div class="card wide">
+          <div class="ic"><svg viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5h-7zM5.5 18.5a2.5 2.5 0 1 0 0 .01M18.5 18.5a2.5 2.5 0 1 0 0 .01"/></svg></div>
+          <h3>6 · Vehicles &amp; the placeholder trick</h3>
+          <p style="margin-bottom:6px">A business rule forbids the <strong>same vehicle being used twice on the same
+            day</strong> (the conflict rule). But two special "placeholder" vehicles are deliberately exempt, so the
+            system can record many drivers at once without raising false conflicts:</p>
+          <div class="tbl-wrap" style="margin-top:14px">
+            <table class="ltable">
+              <thead><tr><th>Placeholder</th><th>Purpose</th></tr></thead>
+              <tbody>
+                <tr><td><code>Vehicle 37</code></td><td>Used for <strong>Day Off</strong> records — many drivers can "share" it on the same day.</td></tr>
+                <tr><td><code>Vehicle 55</code></td><td>Used for <strong>BAOP</strong> internal operations — exempt from the conflict check.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card wide">
+          <div class="ic"><svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></div>
+          <h3>Master data without a screen — and the fixed IDs</h3>
+          <p>Many master records have no page of their own: <strong>routes, depots, the various types</strong> (vendor /
+            service / vehicle / user), <strong>cost models, trainings, service partners</strong> and <strong>ad-hoc
+            categories</strong> are edited through modals inside the screens above, and writing to them is Admin-only.</p>
+          <div class="callout" style="margin-top:18px">
+            <svg viewBox="0 0 24 24"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg>
+            <div><h4>Don't touch the structural IDs</h4><p>The "Day Off" and "NotAllocated" routes, the placeholder
+              vehicles, the <code>DAF/DR/FSR/VSR</code> cost models and the <code>Spare</code> type are fixed and
+              documented. Changing them without understanding the impact breaks validations and corrupts finance
+              downstream.</p></div>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -910,6 +1016,24 @@
           </div>
         </div>
 
+        <div class="card wide">
+          <div class="ic"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M8 14h.01M12 14h.01M16 14h.01"/></svg></div>
+          <h3>How to use the week — the Wednesday-to-Friday ritual</h3>
+          <p style="margin-bottom:18px">The order of operations matters. Following it avoids the most common planning redo:</p>
+          <div class="steps">
+            <div class="step"><p><strong>Enter day-offs first.</strong> If they aren't entered before Generate Week, the driver gets wrongly allocated to the default route.</p></div>
+            <div class="step"><p><strong>Run Generate Week.</strong> The grid fills with defaults; Spares stay clean, available for manual allocation.</p></div>
+            <div class="step"><p><strong>Manual adjustments.</strong> Backups and confirmed extra (Ad-Hoc) services, added between Wednesday and Thursday.</p></div>
+            <div class="step"><p><strong>Submit by Friday.</strong> After that, changes are exceptions and require a genuine urgency justification.</p></div>
+          </div>
+          <div class="callout" style="margin-top:18px">
+            <svg viewBox="0 0 24 24"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg>
+            <div><h4>Generate Week runs in batches, not one transaction</h4><p>Generation fires many calls in sequence. If
+              interrupted halfway, the week can be left <strong>partially generated</strong> — just run it again, and
+              always verify completeness afterwards.</p></div>
+          </div>
+        </div>
+
         <div class="grid" style="grid-column:1/-1;gap:18px">
           <div class="card">
             <div class="ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></div>
@@ -927,6 +1051,25 @@
               ensuring consistency for audit and finance. <strong>Finish</strong> batches validated data to
               accounting audit.</p>
             <span class="tag">Safety gate</span>
+          </div>
+        </div>
+
+        <div class="card wide">
+          <div class="ic"><svg viewBox="0 0 24 24"><circle cx="6" cy="6" r="3"/><circle cx="18" cy="18" r="3"/><path d="M9 6h6a3 3 0 0 1 3 3v6M6 9v6a3 3 0 0 0 3 3h6"/></svg></div>
+          <h3>The state machine that protects the reports</h3>
+          <p style="margin-bottom:6px">An operation can only change status along a permitted path. Once
+            <strong>Finished</strong>, it cannot go back — a terminal state — so no one reopens and alters an
+            already-accounted operation.</p>
+          <div class="tbl-wrap" style="margin-top:14px">
+            <table class="ltable">
+              <thead><tr><th>From</th><th>Allowed to</th><th>Meaning</th></tr></thead>
+              <tbody>
+                <tr><td><code>NotAllocated</code></td><td>Working · OFF</td><td>Driver starts the day or is marked off.</td></tr>
+                <tr><td><code>Working</code></td><td>Finished</td><td>Shift closed — becomes auditable.</td></tr>
+                <tr><td><code>OFF</code></td><td>Working</td><td>An off driver is called in.</td></tr>
+                <tr><td><code>Finished</code></td><td>— (terminal)</td><td><strong>Cannot change.</strong> "I can't edit this" usually means this — protection, not a bug.</td></tr>
+              </tbody>
+            </table>
           </div>
         </div>
 
@@ -989,6 +1132,17 @@
             <div class="pill">MSE<small>+1h45m sort</small></div>
             <div class="pill">All drivers<small>+15m daily bonus</small></div>
           </div>
+          <div class="tbl-wrap" style="margin-top:16px">
+            <table class="ltable">
+              <thead><tr><th>Hour rule</th><th>What it adds</th><th>Why</th></tr></thead>
+              <tbody>
+                <tr><td>Sort Hours · <code>LSE</code></td><td><span class="ar">+</span>2h45m</td><td>Sorting time before the route</td></tr>
+                <tr><td>Sort Hours · <code>LCY</code></td><td><span class="ar">+</span>2h00m</td><td>Sorting time before the route</td></tr>
+                <tr><td>Sort Hours · <code>MSE</code></td><td><span class="ar">+</span>1h45m</td><td>Sorting time before the route</td></tr>
+                <tr><td>Driver Extra Hours</td><td><span class="ar">+</span>15 min/day</td><td>Single daily bonus per driver</td></tr>
+              </tbody>
+            </table>
+          </div>
           <p style="margin-top:16px">It consolidates total stops, total records, exclusive routes, per-depot &amp;
             per-driver data and general metrics — <strong>exportable to Excel or PDF</strong>.</p>
         </div>
@@ -1015,7 +1169,7 @@
             actually lands on — each one scoped to <strong>their own data only</strong>. Admin and Supervisor see the
             broad version of all of them.</p>
           <div class="grid" style="gap:14px">
-            <div class="card reveal" style="opacity:1;transform:none"><h3 style="font-size:15px">Daily Performance Insight</h3><p>The Vendor's landing page and the fallback every blocked route redirects to. Day-by-day performance view.</p></div>
+            <div class="card reveal" style="opacity:1;transform:none"><h3 style="font-size:15px">Daily Performance Insight</h3><p>The Vendor's landing page and the fallback every blocked route redirects to. Day-by-day performance view. If the driver returns to the depot before 17:00, the early finish is visually highlighted.</p></div>
             <div class="card reveal" style="opacity:1;transform:none"><h3 style="font-size:15px">Current Performance</h3><p>Performance for the running period — monthly averages plus a daily breakdown. Vendor sees their own.</p></div>
             <div class="card reveal" style="opacity:1;transform:none"><h3 style="font-size:15px">Current Month</h3><p>A summary of the running month for the user.</p></div>
           </div>
@@ -1130,6 +1284,40 @@
             at issuance, with a live fallback for legacy records) and exportable to PDF. The billable operations are
             sourced from the operations-management module. Sits outside the main sidebar — Admin only.</p>
           <span class="tag">Admin only · PDF export</span>
+        </div>
+
+        <div class="card wide">
+          <div class="ic"><svg viewBox="0 0 24 24"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+          <h3>The cost models — the brain of billing</h3>
+          <p style="margin-bottom:6px">Revenue calculation is centralised and understands several <strong>cost
+            models</strong>, each with its own rate logic. This is what lets the system bill operations as different as a
+            fixed route, an hourly service or a partner service — correctly, from the same audited data.</p>
+          <div class="tbl-wrap" style="margin-top:14px">
+            <table class="ltable">
+              <thead><tr><th>Model</th><th>Billing logic</th></tr></thead>
+              <tbody>
+                <tr><td><code>DAF</code></td><td>Fixed daily rate per route.</td></tr>
+                <tr><td><code>DR</code></td><td>Rate per route / per day driven.</td></tr>
+                <tr><td><code>FSR</code></td><td>Fallback model based on a base value and a category modifier.</td></tr>
+                <tr><td><code>VSR</code> / <code>SP_VSR</code></td><td>Variable rate by bands of stops.</td></tr>
+                <tr><td><code>Hourly Rate</code></td><td>Charge per hour worked.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card wide">
+          <div class="ic"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div>
+          <h3>Bank working days &amp; charge dates</h3>
+          <p>Deduction charge dates never fall on a non-working day. The system computes UK <strong>bank working
+            days</strong>, skipping weekends and holidays — including the "bump" of a holiday that falls on a weekend to
+            the following Monday.</p>
+          <div class="callout info" style="margin-top:18px">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+            <div><h4>Tied to invoices automatically</h4><p>When a deduction is linked to a closed invoice its status flips
+              to <strong>Paid</strong>, and each entry keeps a readable serial code (e.g.
+              <code>RPD-JS-020626-01</code>) for full traceability.</p></div>
+          </div>
         </div>
       </div>
     </section>
