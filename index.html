@@ -124,6 +124,62 @@
   .tab-arrow.next{right:-5px}
   .tab-arrow svg{width:19px;height:19px;stroke:var(--accent);fill:none;stroke-width:2.5;
     stroke-linecap:round;stroke-linejoin:round}
+
+  /* ===========================================================
+     SEARCH
+  =========================================================== */
+  .search-shell{position:relative;z-index:45;margin:0 0 26px}
+  .search-box{display:flex;align-items:center;gap:10px;padding:12px 14px;
+    border:1px solid var(--stroke);border-radius:100px;
+    background:linear-gradient(150deg,rgba(255,255,255,.78),rgba(255,255,255,.5));
+    backdrop-filter:blur(24px) saturate(180%);-webkit-backdrop-filter:blur(24px) saturate(180%);
+    box-shadow:var(--shadow),inset 0 1px 0 var(--glass-hi);
+    transition:border-color .25s,box-shadow .25s}
+  .search-box:focus-within{border-color:rgba(79,109,255,.55);
+    box-shadow:0 24px 60px -30px rgba(60,80,140,.4),0 0 0 4px rgba(79,109,255,.12),inset 0 1px 0 var(--glass-hi)}
+  .search-ico{width:20px;height:20px;flex:0 0 auto;stroke:var(--ink-faint);fill:none;stroke-width:2.2;
+    stroke-linecap:round;stroke-linejoin:round;transition:stroke .25s}
+  .search-box:focus-within .search-ico{stroke:var(--accent)}
+  #searchInput{flex:1 1 auto;border:0;background:transparent;outline:none;
+    font-family:var(--font);font-size:15.5px;color:var(--ink);min-width:0}
+  #searchInput::placeholder{color:var(--ink-faint)}
+  .search-kbd{flex:0 0 auto;font-family:var(--font);font-size:12px;font-weight:600;color:var(--ink-faint);
+    border:1px solid var(--stroke-strong);border-radius:7px;padding:2px 8px;background:rgba(255,255,255,.6);
+    line-height:1.4}
+  .search-clear{flex:0 0 auto;display:none;width:28px;height:28px;border:0;cursor:pointer;border-radius:50%;
+    place-items:center;background:rgba(120,140,190,.12);transition:background .2s}
+  .search-clear:hover{background:rgba(120,140,190,.22)}
+  .search-clear svg{width:15px;height:15px;stroke:var(--ink-dim);fill:none;stroke-width:2.4;
+    stroke-linecap:round;stroke-linejoin:round}
+  .search-shell.has-text .search-kbd{display:none}
+  .search-shell.has-text .search-clear{display:grid}
+
+  .search-results{position:absolute;top:calc(100% + 10px);left:0;right:0;
+    border:1px solid var(--stroke);border-radius:var(--radius);
+    background:linear-gradient(150deg,rgba(255,255,255,.92),rgba(255,255,255,.82));
+    backdrop-filter:blur(28px) saturate(180%);-webkit-backdrop-filter:blur(28px) saturate(180%);
+    box-shadow:var(--shadow),inset 0 1px 0 var(--glass-hi);
+    max-height:60vh;overflow-y:auto;padding:8px;
+    opacity:0;transform:translateY(-8px);pointer-events:none;transition:opacity .22s,transform .22s}
+  .search-results.open{opacity:1;transform:translateY(0);pointer-events:auto}
+  .search-meta{padding:8px 12px 10px;font-size:12.5px;color:var(--ink-faint);font-weight:600;
+    letter-spacing:.02em;text-transform:uppercase}
+  .search-item{display:flex;gap:12px;align-items:flex-start;padding:11px 12px;border-radius:var(--radius-sm);
+    cursor:pointer;border:1px solid transparent;transition:background .15s,border-color .15s}
+  .search-item:hover,.search-item.sel{background:rgba(79,109,255,.08);border-color:rgba(79,109,255,.2)}
+  .search-badge{flex:0 0 auto;font-size:11.5px;font-weight:700;color:var(--accent);
+    background:rgba(79,109,255,.12);border-radius:8px;padding:3px 9px;margin-top:1px;white-space:nowrap}
+  .search-snippet{flex:1 1 auto;font-size:14px;color:var(--ink-dim);line-height:1.5}
+  .search-snippet mark{background:rgba(17,184,166,.22);color:var(--ink);border-radius:4px;padding:0 2px;font-weight:600}
+  .search-empty{padding:22px 14px;text-align:center;color:var(--ink-faint);font-size:14px}
+
+  /* flash highlight on the element a search result points to */
+  .search-hit{animation:searchHit 2.4s ease}
+  @keyframes searchHit{
+    0%{box-shadow:0 0 0 0 rgba(17,184,166,.55);background:rgba(17,184,166,.14);border-radius:10px}
+    70%{box-shadow:0 0 0 10px rgba(17,184,166,0);background:rgba(17,184,166,.08)}
+    100%{box-shadow:0 0 0 0 rgba(17,184,166,0);background:transparent}
+  }
   .tab{flex:1 0 auto;display:flex;align-items:center;justify-content:center;gap:8px;
     white-space:nowrap;padding:11px 18px;border-radius:100px;cursor:pointer;
     font-size:14px;font-weight:600;color:var(--ink-dim);border:none;background:none;
@@ -485,12 +541,12 @@
 
   <!-- ============ HERO ============ -->
   <header class="hero">
-    <div class="eyebrow"><span class="dot"></span> System Presentation Manual</div>
+    <div class="eyebrow"><span class="dot"></span> Master System Manual</div>
     <h1 class="title">Logixsphere<br><span class="grad">Operations Platform</span></h1>
     <p class="lede">A single ecosystem that integrates planning, field execution, auditing,
       performance and billing — built so every module works connected, end to end.</p>
     <div class="hero-stats">
-      <div class="stat"><b>15</b><span>Modules</span></div>
+      <div class="stat"><b>25+</b><span>Pages &amp; Modules</span></div>
       <div class="stat"><b>4</b><span>Depots</span></div>
       <div class="stat"><b>3</b><span>Access Levels</span></div>
       <div class="stat"><b>1</b><span>Platform</span></div>
@@ -518,11 +574,25 @@
         <svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.5 1.5"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.5-1.5"/></svg>Connections</button>
       <button class="tab" data-tab="practices">
         <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>Best Practices</button>
+      <button class="tab" data-tab="support">
+        <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H8l-5 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M8 8h8M8 12h5"/></svg>Support</button>
     </div>
     <button class="tab-arrow prev" type="button" aria-label="Scroll tabs left">
       <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
     <button class="tab-arrow next" type="button" aria-label="Scroll tabs right">
       <svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
+  </div>
+
+  <!-- ============ SEARCH ============ -->
+  <div class="search-shell">
+    <div class="search-box">
+      <svg class="search-ico" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input type="text" id="searchInput" placeholder="Search the manual — modules, fields, rules…" autocomplete="off" spellcheck="false" aria-label="Search the manual">
+      <kbd class="search-kbd">/</kbd>
+      <button class="search-clear" type="button" aria-label="Clear search">
+        <svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+    </div>
+    <div class="search-results" id="searchResults" role="listbox"></div>
   </div>
 
   <main>
@@ -708,6 +778,40 @@
             <div class="step"><p>Access is released according to the assigned <strong>profile &amp; permissions</strong>.</p></div>
           </div>
         </div>
+
+        <div class="card wide">
+          <div class="ic"><svg viewBox="0 0 24 24"><path d="M4 4h16v16H4z"/><path d="M8 9h8M8 13h5"/><path d="m15 17 2 2 4-4"/></svg></div>
+          <h3>Public account &amp; password routes</h3>
+          <p style="margin-bottom:16px">Before authentication, the platform exposes a small set of routes that complete
+            account creation and credential recovery. These screens do not grant an operational profile by themselves;
+            they activate or recover an account that already exists in the system.</p>
+          <div class="tbl-wrap" style="margin:0">
+            <table class="ltable">
+              <thead><tr><th>Route</th><th>Purpose</th></tr></thead>
+              <tbody>
+                <tr><td class="path">/register</td><td>Account creation flow for a pre-authorized record.</td></tr>
+                <tr><td class="path">/register-successful</td><td>Confirmation that registration completed successfully.</td></tr>
+                <tr><td class="path">/send-password-reset-token</td><td>Sends the reset link and temporary token by e-mail.</td></tr>
+                <tr><td class="path">/reset-password</td><td>Validates the token and stores the new password.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card wide">
+          <div class="ic"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12h6M12 9v6"/></svg></div>
+          <h3>Session lifecycle &amp; token protection</h3>
+          <p>The authenticated session is carried by an <code>auth-token</code> JWT stored in an HTTP-only cookie.
+            The token identifies the user, profile, company and Service Partner where applicable. Near expiry, the
+            authentication middleware can renew it transparently; when it is missing, invalid or expired, the user is
+            returned to Login so an old credential cannot keep accessing protected data.</p>
+          <div class="callout info" style="margin-top:18px">
+            <svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+            <div><h4>Profile routing is automatic</h4><p>The destination after login is derived from
+              <code>user_type_id</code>. Users do not choose an administrative area manually, and an unknown or
+              corrupted profile is sent back to the login screen.</p></div>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -796,7 +900,7 @@
               <tr><td class="path">/mobile-invoice</td><td>Invoices (mobile)</td><td class="rc">✅</td><td class="rc">✅</td><td class="rc">🟡<small>own</small></td></tr>
               <tr><td class="path">/deductions</td><td>Deductions (operational)</td><td class="rc">✅</td><td class="rc">🟡<small>own</small></td><td class="rc">🟡<small>own</small></td></tr>
               <tr><td class="path">/requests</td><td>Create / track requests</td><td class="rc">✅</td><td class="rc">✅</td><td class="rc">✅</td></tr>
-              <tr><td class="path">/requests-inbox</td><td>Requests inbox</td><td class="rc">✅</td><td class="rc">✅</td><td class="rc">🚫</td></tr>
+              <tr><td class="path">/requests-inbox</td><td>Requests inbox</td><td class="rc">✅</td><td class="rc">🚫<small>not whitelisted</small></td><td class="rc">🚫</td></tr>
               <tr><td class="path">/financial-invoices</td><td>Invoices (management)</td><td class="rc">✅</td><td class="rc">🚫</td><td class="rc">🚫</td></tr>
               <tr><td class="path">/adhoc-works-invoice-management</td><td>Ad-hoc billing</td><td class="rc">✅</td><td class="rc">🚫</td><td class="rc">🚫</td></tr>
               <tr><td class="path">/deductions-disbursements-recharges</td><td>Financial deductions</td><td class="rc">✅</td><td class="rc">🚫</td><td class="rc">🚫</td></tr>
@@ -836,8 +940,8 @@
               <span class="tag" style="margin:0 0 10px">👔 Supervisor · type 3</span>
               <p>Operations manager without a wallet. Everything the Vendor has <strong>plus</strong> <code>home</code>,
                 <code>week-planner</code> (incl. Generate Week), <code>daily-game-plan</code>,
-                <code>daily-operations-reports</code>, <code>vendor-performance</code> and <code>requests-inbox</code>.
-                <strong>No finance, no master data, no request approval, and reads only its own deductions.</strong>
+                <code>daily-operations-reports</code> and <code>vendor-performance</code>.
+                <strong>No finance, no master data, no dedicated Requests Inbox, no request approval, and reads only its own deductions.</strong>
                 Off-list route → back to <code>daily-game-plan</code>.</p>
             </div>
             <div class="card reveal" style="opacity:1;transform:none">
@@ -1094,7 +1198,8 @@
           <div class="ic"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
           <h3>14 · Requests — the field channel</h3>
           <p>Where any user creates and tracks their own requests (vendor requests) — the way a driver asks for
-            something: a deduction, a correction, a day off, an ad-hoc need. <strong>All three profiles</strong>
+            something through one of the three supported types: <strong>Day OFF, Holiday or Pre-Payment</strong>.
+            An approved Pre-Payment can become a financial deduction on the driver's invoice. <strong>All three profiles</strong>
             (Admin, Supervisor, Vendor) reach this screen; it is the Vendor's single channel to management.</p>
           <span class="tag">Open to everyone</span>
         </div>
@@ -1103,12 +1208,14 @@
           <div class="ic"><svg viewBox="0 0 24 24"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg></div>
           <h3>15 · Requests Inbox — management side</h3>
           <p>The inbox where incoming requests are managed, with a month selector and a badge counting the current
-            month's pending items. Admin and Supervisor both see the inbox (the sidebar counts pendencies for both);
-            the Vendor has no access.</p>
+            month's pending items. The dedicated page is in the <strong>Admin whitelist only</strong>. Supervisors may
+            receive operational request indicators through other flows, but direct navigation to
+            <code>/requests-inbox</code> is blocked; Vendors have no access.</p>
           <div class="callout" style="margin-top:18px">
             <svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
-            <div><h4>Approval is Admin-only</h4><p>Approving, editing or deleting a request is <strong>exclusive to the
-              Admin</strong>. The Supervisor sees the inbox, but the final decision belongs to the Admin.</p></div>
+            <div><h4>Decision is Admin-only</h4><p>Opening the dedicated inbox and approving, editing or deleting a
+              request are <strong>exclusive to the Admin</strong>. The request history remains visible to its creator
+              from the regular Requests page.</p></div>
           </div>
         </div>
       </div>
@@ -1301,7 +1408,7 @@
               <tbody>
                 <tr><td><code>DAF</code></td><td>Fixed daily rate per route.</td></tr>
                 <tr><td><code>DR</code></td><td>Rate per route / per day driven.</td></tr>
-                <tr><td><code>FSR</code></td><td>Fallback model based on a base value and a category modifier.</td></tr>
+                <tr><td><code>FSR</code></td><td>Full Stop Rate: total stops multiplied by the rate; if no rate is supplied, the valid band's fixed price is used.</td></tr>
                 <tr><td><code>VSR</code> / <code>SP_VSR</code></td><td>Variable rate by bands of stops.</td></tr>
                 <tr><td><code>Hourly Rate</code></td><td>Charge per hour worked.</td></tr>
               </tbody>
@@ -1527,10 +1634,77 @@
       </div>
     </section>
 
+    <!-- =================================================================
+         SUPPORT  (chat, files and training/compliance)
+    ================================================================== -->
+    <section class="panel" id="support">
+      <div class="panel-head"><span class="num">08</span><h2>Support &amp; Compliance</h2></div>
+      <p class="panel-intro">Cross-cutting services that keep people connected, documents attached to the correct
+        records and operational qualifications visible before they become a compliance risk.</p>
+
+      <div class="grid">
+        <div class="card wide">
+          <div class="ic"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H8l-5 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M8 8h8M8 12h5"/></svg></div>
+          <h3>Chat &amp; collaboration</h3>
+          <p>The internal communication layer supports direct conversations, a global group, message history,
+            read markers and unread counters. Recipient rules follow the access profile: Admin and Supervisor can
+            communicate broadly, while a Vendor can start conversations only with Admins or Supervisors, never
+            directly with another Vendor.</p>
+          <div class="pills" style="margin-top:16px">
+            <div class="pill">Direct chat</div>
+            <div class="pill">Global group</div>
+            <div class="pill">Read status</div>
+            <div class="pill">Unread count</div>
+          </div>
+        </div>
+
+        <div class="card wide">
+          <div class="ic"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M12 18v-6M9 15h6"/></svg></div>
+          <h3>Files &amp; document uploads</h3>
+          <p>Vendor, vehicle and training documents are uploaded through a temporary pre-signed URL. The file must
+            then be linked to the correct business record so it can be found by compliance and operational screens.
+            The upload window expires, so a delayed upload must request a new URL rather than reusing an old one.</p>
+          <div class="steps" style="margin-top:18px">
+            <div class="step"><p>Request an authorized <strong>upload URL</strong>.</p></div>
+            <div class="step"><p>Send the file before the temporary URL <strong>expires</strong>.</p></div>
+            <div class="step"><p>Link it to the correct <strong>Vendor, vehicle or training</strong>.</p></div>
+            <div class="step"><p>Verify that the document is visible from its destination record.</p></div>
+          </div>
+        </div>
+
+        <div class="card wide">
+          <div class="ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="6"/><path d="M8.2 13.1 7 22l5-3 5 3-1.2-8.9"/></svg></div>
+          <h3>Trainings &amp; document compliance</h3>
+          <p>Training records are linked to Vendors with completion and expiry dates, plus supporting evidence where
+            applicable. These dates feed the Document Compliance indicators on Home. Missing or incorrect expiry data
+            can make a qualified driver appear irregular, or hide a requirement that should be renewed.</p>
+          <ul class="feat-list" style="margin-top:14px">
+            <li><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Register the training or compliance requirement</li>
+            <li><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Link it to the correct Vendor</li>
+            <li><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Record completion and expiration dates</li>
+            <li><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Attach evidence and monitor Home alerts</li>
+          </ul>
+        </div>
+
+        <div class="card wide">
+          <div class="ic"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg></div>
+          <h3>Support checks before escalating</h3>
+          <p style="margin-bottom:6px">Several common incidents are expected protections or expired temporary
+            resources rather than application failures. Check these first:</p>
+          <ul class="cautions">
+            <li><span class="sev warn"><span class="d"></span>Chat</span><p>A Vendor cannot select another Vendor as a recipient; this is an intentional communication boundary.</p></li>
+            <li><span class="sev warn"><span class="d"></span>Files</span><p>An upload that starts after the pre-signed URL expires will fail; request a new URL and retry.</p></li>
+            <li><span class="sev crit"><span class="d"></span>Compliance</span><p>Missing expiry dates can create incorrect operational alerts and should be corrected at the source record.</p></li>
+            <li><span class="sev minor"><span class="d"></span>Counters</span><p>Unread and pending badges are action indicators, not a substitute for the full history report.</p></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
   </main>
 
   <footer>
-    <p><b>Logixsphere</b> — System Presentation Manual · Development Order</p>
+    <p><b>Logixsphere</b> — Master System Manual · Development Order</p>
     <p style="margin-top:6px">Planning → Execution → Auditing → Performance → Billing, integrated in a single platform.</p>
   </footer>
 
@@ -1671,6 +1845,126 @@
     card.style.setProperty('--mx',(e.clientX-r.left)+'px');
     card.style.setProperty('--my',(e.clientY-r.top)+'px');
   });
+
+  /* ---------- SEARCH ---------- */
+  (function(){
+    const shell   = document.querySelector('.search-shell');
+    const input   = document.getElementById('searchInput');
+    const results = document.getElementById('searchResults');
+    const clearBtn= document.querySelector('.search-clear');
+    if(!input) return;
+
+    // Map each panel id -> its tab label (for result badges)
+    const tabLabels = {};
+    tabs.forEach(t => tabLabels[t.dataset.tab] = t.textContent.trim());
+
+    // Build a lightweight index of text-bearing leaf elements per panel
+    const index = [];
+    panels.forEach(panel=>{
+      panel.querySelectorAll('h2,h3,h4,p,li,th,td').forEach(el=>{
+        const text = el.textContent.replace(/\s+/g,' ').trim();
+        if(text.length < 4) return;
+        index.push({pid:panel.id, el, text, lower:text.toLowerCase()});
+      });
+    });
+
+    const esc = s => s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+    function escapeHtml(s){return s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+
+    // Build a snippet centred on the first match, with the term highlighted
+    function snippet(text, q){
+      const i = text.toLowerCase().indexOf(q);
+      const start = Math.max(0, i - 45);
+      let s = text.slice(start, start + 160);
+      if(start > 0) s = '…' + s;
+      if(start + 160 < text.length) s = s + '…';
+      const re = new RegExp('('+esc(q)+')','ig');
+      return escapeHtml(s).replace(re,'<mark>$1</mark>');
+    }
+
+    let items = [], sel = -1;
+
+    function close(){ results.classList.remove('open'); sel = -1; }
+    function open(){ results.classList.add('open'); }
+
+    function run(){
+      const q = input.value.trim().toLowerCase();
+      shell.classList.toggle('has-text', q.length > 0);
+      if(q.length < 2){ close(); results.innerHTML=''; return; }
+
+      const hits = index.filter(it => it.lower.includes(q)).slice(0, 24);
+      results.innerHTML = '';
+      sel = -1;
+
+      if(!hits.length){
+        results.innerHTML = '<div class="search-empty">No matches for “'+escapeHtml(input.value.trim())+'”</div>';
+        open(); return;
+      }
+
+      const meta = document.createElement('div');
+      meta.className = 'search-meta';
+      meta.textContent = hits.length + (hits.length === 24 ? '+ results' : ' result' + (hits.length>1?'s':''));
+      results.appendChild(meta);
+
+      items = hits.map(hit=>{
+        const row = document.createElement('div');
+        row.className = 'search-item';
+        row.setAttribute('role','option');
+        row.innerHTML = '<span class="search-badge">'+escapeHtml(tabLabels[hit.pid]||hit.pid)+'</span>'+
+                        '<span class="search-snippet">'+snippet(hit.text, q)+'</span>';
+        row.addEventListener('click',()=>goTo(hit));
+        results.appendChild(row);
+        return row;
+      });
+      open();
+    }
+
+    function goTo(hit){
+      // activate the right tab via its existing click handler
+      const tabBtn = document.querySelector('.tab[data-tab="'+hit.pid+'"]');
+      if(tabBtn && !tabBtn.classList.contains('active')) tabBtn.click();
+      close();
+      setTimeout(()=>{
+        hit.el.scrollIntoView({behavior:'smooth', block:'center'});
+        hit.el.classList.remove('search-hit');
+        void hit.el.offsetWidth;            // restart animation
+        hit.el.classList.add('search-hit');
+        setTimeout(()=>hit.el.classList.remove('search-hit'), 2400);
+      }, 140);
+    }
+
+    function move(dir){
+      if(!items.length) return;
+      if(sel >= 0) items[sel].classList.remove('sel');
+      sel = (sel + dir + items.length) % items.length;
+      items[sel].classList.add('sel');
+      items[sel].scrollIntoView({block:'nearest'});
+    }
+
+    input.addEventListener('input', run);
+    input.addEventListener('focus', ()=>{ if(input.value.trim().length >= 2) open(); });
+    input.addEventListener('keydown', e=>{
+      if(e.key === 'ArrowDown'){ e.preventDefault(); move(1); }
+      else if(e.key === 'ArrowUp'){ e.preventDefault(); move(-1); }
+      else if(e.key === 'Enter'){ if(sel >= 0) items[sel].click(); else if(items[0]) items[0].click(); }
+      else if(e.key === 'Escape'){ if(results.classList.contains('open')) close(); else { input.value=''; shell.classList.remove('has-text'); } }
+    });
+
+    clearBtn.addEventListener('click', ()=>{
+      input.value=''; shell.classList.remove('has-text'); close(); input.focus();
+    });
+
+    // close on outside click
+    document.addEventListener('click', e=>{ if(!shell.contains(e.target)) close(); });
+
+    // "/" shortcut focuses the search (unless already typing in a field)
+    document.addEventListener('keydown', e=>{
+      if(e.key === '/' && document.activeElement !== input &&
+         !/^(INPUT|TEXTAREA)$/.test(document.activeElement.tagName)){
+        e.preventDefault(); input.focus();
+      }
+    });
+  })();
 </script>
 </body>
 </html>
